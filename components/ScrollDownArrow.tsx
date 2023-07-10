@@ -1,0 +1,65 @@
+import React, { useEffect, useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
+
+const ScrollDownArrow: React.FC = () => {
+  const [showArrow, setShowArrow] = useState(true);
+
+  const handleScroll = () => {
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+
+    if (scrollPosition > windowHeight * 0.3) {
+      setShowArrow(false);
+    } else {
+      setShowArrow(true);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return (
+    <ScrollDownArrowContainer $show={showArrow}>
+      <Arrow src="down_arrow.svg" alt="Scroll down" />
+    </ScrollDownArrowContainer>
+  );
+};
+
+const moveUpDown = keyframes`
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+`;
+
+const ScrollDownArrowContainer = styled.div<{ $show: boolean }>`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+
+  ${(props) =>
+    !props.$show &&
+    css`
+      opacity: 0;
+    `}
+`;
+
+const Arrow = styled.img`
+  width: 50px;
+  height: 50px;
+  animation: ${moveUpDown} 1s ease-in-out infinite;
+  cursor: pointer;
+`;
+
+export default ScrollDownArrow;
