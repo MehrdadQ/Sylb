@@ -4,6 +4,7 @@ import { Slide } from "react-awesome-reveal";
 import styled from 'styled-components';
 import NavigationBar from '../components/NavigationBar';
 import ScrollDownArrow from '../components/ScrollDownArrow';
+import { useRouter } from 'next/router';
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
@@ -17,12 +18,31 @@ const LearnMoreText = [
 
 
 const Home: NextPage = () => {
+  const router = useRouter();
+
+  const handleSignUpClick = () => {
+    router.push('/signup');
+  };
+  
   const scrollToLearnMore = () => {
     const element = document.getElementById('learn-more');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   };
+
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket:process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  };
+  
+  console.log(firebaseConfig)
+
 
   return (
     <>
@@ -34,7 +54,7 @@ const Home: NextPage = () => {
               <MainTitle>Welcome to <span>Sylb.io</span>,</MainTitle>
               <MainText>The ultimate course information guide for UofT students</MainText>
               <ButtonGroup>
-                <CallToActionBtn>
+                <CallToActionBtn onClick={handleSignUpClick}>
                   Sign Up For Free
                 </CallToActionBtn>
                 <CallToActionBtn onClick={scrollToLearnMore}>
@@ -43,7 +63,7 @@ const Home: NextPage = () => {
               </ButtonGroup>
             </TextSection>
             <ImgContainer>
-              <Image src="/../public/hero2.png" alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
+              <Image src="/../public/landingPage1.png" alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
           </Section>
         </Slide>
@@ -60,7 +80,7 @@ const Home: NextPage = () => {
         <Slide direction='right'>
           <Section id="learn-more">
             <ImgContainer>
-              <Image src="/../public/hero4.png" alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
+              <Image src="/../public/landingPage2.png" alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
             <TextSection>
               <Title>Your Secret Weapon for Course Selection</Title>

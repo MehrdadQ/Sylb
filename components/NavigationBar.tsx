@@ -1,9 +1,19 @@
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { Nav, NavItem, Navbar } from 'react-bootstrap';
 import { styled } from 'styled-components';
 
 
 const NavigationBar = () => {
+  const router = useRouter();
+
+  const handleSignUpClick = () => {
+    router.push('/signup');
+  };
+  
+  const handleLoginClick = () => {
+    router.push('/login');
+  }
   
   return (
     <Sticky>
@@ -22,10 +32,14 @@ const NavigationBar = () => {
           <ButtonContainer>
             <Nav>
               <NavItem>
-                <NavButton>Sign up</NavButton>
+                <NavButton onClick={handleSignUpClick}>
+                  Sign up
+                </NavButton>
               </NavItem>
               <NavItem>
-                <NavButton>Log in</NavButton>
+                <NavButton onClick={handleLoginClick}>
+                  Log in
+                </NavButton>
               </NavItem>
             </Nav>
           </ButtonContainer>
