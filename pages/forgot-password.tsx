@@ -1,187 +1,80 @@
-import { onAuthStateChanged } from 'firebase/auth';
-import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import EmailSvg from "../public/email.svg";
-import GoogleSvg from "../public/google.svg";
-import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
 
-const SignUpPage: NextPage = () => {
-  const [isEmail, setIsEmail] = useState<boolean>(false)
+const LoginPage: NextPage = () => {
   const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordConfirm, setPasswordConfirm] = useState<string>('');
   const [errors, setErrors] = useState<string[]>([]);
-
-  const [user, setUser] = useRecoilState(userState);
-
-  const spanRef = useRef<HTMLSpanElement>(null);
 
   const router = useRouter();
 
   useEffect(() => {
-    const newErrors = [];
-    if (password.length < 7) {
-      newErrors.push("Password must be at least 7 characters long");
-    }
-    if (password !== passwordConfirm) {
-      newErrors.push("Passwords do not match");
-    }
-    setErrors(newErrors);
-  }, [password, passwordConfirm]);
-
-  const setLoggedInUser = () => {
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        const uid = currentUser.uid;
-        setUser(uid)
-      }
-    });
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      spanRef.current?.click();
-    }
-  };
+    setErrors([]);
+  }, [email]);
 
   const goToLogin = () => {
     router.push("/login")
   }
 
-  const goToHome = () => {
-    router.push("/home")
-  }
-
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleResetPassword =  async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await auth.createUserWithEmailAndPassword(email, password);
-      setLoggedInUser();
-      goToHome();
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        setErrors(["The email address you provided is already in use. Please try a different email address."]);
-      } else if (error.code === 'auth/invalid-email') {
-        setErrors(["Invalid email address entered."]);
-      } else if (error.code === 'auth/operation-not-allowed') {
-        setErrors(["This operation is not allowed. Please contact the site administrator for more information."]);
-      } else if (error.code === 'auth/weak-password') {
-        setErrors(["The password you provided is not strong enough. Please choose a stronger password."]);
+      await auth.sendPasswordResetEmail(email)
+    }
+
+    catch (error: any) {
+      if (error.code === 'auth/invalid-email') {
+        setErrors(['Invalid email address entered.']);
+      } else if (error.code === 'auth/user-not-found') {
+        setErrors(["We could not find an account associated with the email address you provided. Please check that you have entered the correct email address or create a new account."]);
+      } else if (error.code === 'auth/too-many-requests') {
+        setErrors(["Too many requests, please try again later."]);
       } else {
-        setErrors([error.message]);
+        setErrors(['An unexpected error occurred. Please try again later.']);
       }
     }
-  };
-
-  const handleGoogleSignup = async () => {
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      await auth.signInWithPopup(provider);
-      setLoggedInUser();
-      goToHome();
-    } catch (error) {
-      console.error('Error signing up with Google:', error);
-    }
-  };
+  }
 
   return (
-    <SignUpPageContainer>
+    <LoginPageContainer>
       <InputContainer>
-        {!isEmail ? <SignupOptionsContainer>
-          <Title>Create an account</Title>
-          <SignupButton style={{marginBottom: "1rem"}} onClick={handleGoogleSignup}>
-            <Image src={GoogleSvg} width={25} height={25} alt='Google logo'/>
-            <div>Sign up with Google</div>
-          </SignupButton>
-          <SignupButton onClick={() => setIsEmail(true)}>
-            <Image src={EmailSvg} width={25} height={25} alt='Email logo'/>
-            <div>Sign up using Email</div>
-          </SignupButton>
-          <DividerLine/>
-          <LoginMessage>
-            Already have an account?{' '}
-            <span
-              onClick={goToLogin}
-              tabIndex={0}
-              ref={spanRef}
-              onKeyDown={handleKeyDown}
-            >
-              Log in here.
-            </span>
-          </LoginMessage>
-        </SignupOptionsContainer> :
         <FormContainer>
-          <SignUpForm onSubmit={handleSignup}>
+          <Form onSubmit={handleResetPassword}>
             <Label>Email:</Label>
             <Input
               type="email"
               value={email}
               onChange={(e: any) => setEmail(e.target.value)}
             />
-            <Label>Password:</Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e: any) => setPassword(e.target.value)}
-            />
-            <Label>Confirm Password:</Label>
-            <Input
-              type="password"
-              value={passwordConfirm}
-              onChange={(e: any) => setPasswordConfirm(e.target.value)}
-            />
             {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
             <ButtonGroup>
-              <Button onClick={() => setIsEmail(false)}>Back to sign up options</Button>
+              <Button
+                onClick={goToLogin}
+              >
+                Back to Login
+              </Button>
               <Button
                 type="submit"
                 style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
                 disabled={errors.length > 0 || email === ""}
               >
-                Sign Up
+                Reset Password
               </Button>
             </ButtonGroup>
-          </SignUpForm>
-        </FormContainer>}
+          </Form>
+        </FormContainer>
       </InputContainer>
-    </SignUpPageContainer>
-  );
+    </LoginPageContainer>
+  )
 };
-
-const DividerLine = styled.hr`
-  border: 0;
-  clear: both;
-  display: block;
-  width: 70%;
-  opacity: 1;
-  background-color: #EDEDEE;
-  height: 1px;
-  margin: 1.5rem 1rem 1rem 1rem;
-
-  @media (max-width: 800px) {
-    width: 100%;
-  }
-`;
-
-const LoginMessage = styled.p`
-  span {
-    color: #488ED8;
-    cursor: pointer;
-  }
-`;
 
 const ErrorMessage = styled.p`
   color: #d85252;
 `;
 
-const SignUpPageContainer = styled.div`
+const LoginPageContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -217,14 +110,6 @@ const InputContainer = styled.div`
   }
 `;
 
-const SignupOptionsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: end;
-  width: 100%;
-`;
-
 const FormContainer = styled.div`
   position: relative;
   width: 80%;
@@ -234,7 +119,7 @@ const FormContainer = styled.div`
   }
 `;
 
-const SignupButton = styled.button`
+const LoginButton = styled.button`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -352,7 +237,7 @@ const ButtonGroup = styled.div`
   justify-content: space-around;
 `;
 
-const SignUpForm = styled.form`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -395,4 +280,4 @@ const Title = styled.h3`
   }
 `;
 
-export default SignUpPage;
+export default LoginPage;

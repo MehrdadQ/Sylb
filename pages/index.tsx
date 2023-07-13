@@ -1,14 +1,21 @@
+import { onAuthStateChanged } from "firebase/auth";
 import type { NextPage } from 'next';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { Slide } from "react-awesome-reveal";
+import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import NavigationBar from '../components/NavigationBar';
 import ScrollDownArrow from '../components/ScrollDownArrow';
-import { useRouter } from 'next/router';
+import { userState } from '../utilities/atoms';
+import { auth } from '../utilities/firebase';
+
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
-  Where do we find the syllabus? Does this course require an essay? Is there an autofail on the exam? \
+  Where do we find the syllabus? What has the course average been for each professor? \
+  Does this course require an essay? Is there an autofail on the exam? \
   Are there group projects? What does the grading scheme look like? \
   Are tutorials mandatory? And who's the best professor for this course?",
   "Introducing Sylb! All your questions answered. Sign up for free and unlock the power of \
@@ -19,6 +26,16 @@ const LearnMoreText = [
 
 const Home: NextPage = () => {
   const router = useRouter();
+  const [user, setUser] = useRecoilState(userState);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const uid = currentUser.uid;
+        setUser(uid)
+      }
+    });
+  }, [setUser])
 
   const handleSignUpClick = () => {
     router.push('/signup');
@@ -30,19 +47,6 @@ const Home: NextPage = () => {
       element.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   };
-
-  const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket:process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  };
-  
-  console.log(firebaseConfig)
-
 
   return (
     <>
