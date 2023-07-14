@@ -105,7 +105,7 @@ const LoginPage: NextPage = () => {
           {errors.length > 0 && <ErrorMessage style={{padding: "1rem", margin: "0"}}>{errors[0]}</ErrorMessage>}
           <DividerLine/>
           <LoginMessage>
-            Dont have an account?{' '}
+            Don&apos;t have an account?{' '}
             <span
               onClick={goToSignup}
               tabIndex={0}
@@ -343,10 +343,6 @@ const Button = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
   }
-
-  /* @media (max-width: "1000px") {
-    width: 100%;
-  } */
 `
 
 const ButtonGroup = styled.div`

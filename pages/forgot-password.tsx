@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { auth } from '../utilities/firebase';
 
-const LoginPage: NextPage = () => {
+const ForgotPasswordPage: NextPage = () => {
   const [email, setEmail] = useState<string>('');
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -38,7 +38,7 @@ const LoginPage: NextPage = () => {
   }
 
   return (
-    <LoginPageContainer>
+    <Container>
       <InputContainer>
         <FormContainer>
           <Form onSubmit={handleResetPassword}>
@@ -66,7 +66,7 @@ const LoginPage: NextPage = () => {
           </Form>
         </FormContainer>
       </InputContainer>
-    </LoginPageContainer>
+    </Container>
   )
 };
 
@@ -74,7 +74,7 @@ const ErrorMessage = styled.p`
   color: #d85252;
 `;
 
-const LoginPageContainer = styled.div`
+const Container = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -115,64 +115,6 @@ const FormContainer = styled.div`
   width: 80%;
 
   @media (max-width: 800px) {
-    width: 100%;
-  }
-`;
-
-const LoginButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  background-color: #FFFFFF;
-  border: 1px solid #222222;
-  border-radius: 8px;
-  box-sizing: border-box;
-  color: #222222;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 20px;
-  margin: 0;
-  outline: none;
-  padding: 13px 23px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  touch-action: manipulation;
-  transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
-  user-select: none;
-  -webkit-user-select: none;
-  width: 70%;
-
-  &:focus-visible {
-    box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
-    transition: box-shadow .2s;
-  }
-
-  &:active {
-    background-color: #F7F7F7;
-    border-color: #000000;
-    transform: scale(.96);
-  }
-
-  &:hover {
-    opacity: 0.9;
-  }
-
-  &:disabled {
-    border-color: #DDDDDD;
-    color: #DDDDDD;
-    cursor: not-allowed;
-    opacity: 1;
-  }
-
-  div {
-    margin-left: 18px;
-  }
-
-  @media (max-width: 800px) {
-    font-size: 14px;
     width: 100%;
   }
 `;
@@ -222,10 +164,6 @@ const Button = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
   }
-
-  /* @media (max-width: "1000px") {
-    width: 100%;
-  } */
 `
 
 const ButtonGroup = styled.div`
@@ -271,13 +209,4 @@ const Input = styled.input`
   margin-bottom: 1rem;
 `;
 
-const Title = styled.h3`
-  font-size: 28px;
-  margin-bottom: 1rem;
-
-  @media (max-width: 800px) {
-    font-size: 22px;
-  }
-`;
-
-export default LoginPage;
+export default ForgotPasswordPage;

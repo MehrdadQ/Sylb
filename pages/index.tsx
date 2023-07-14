@@ -17,14 +17,14 @@ const LearnMoreText = [
   Where do we find the syllabus? What has the course average been for each professor? \
   Does this course require an essay? Is there an autofail on the exam? \
   Are there group projects? What does the grading scheme look like? \
-  Are tutorials mandatory? And who's the best professor for this course?",
+  Are tutorials mandatory? Are the lectures recorded?",
   "Introducing Sylb! All your questions answered. Sign up for free and unlock the power of \
   knowledge-sharing. 📚💡",
   "By students, for students. 💪"
 ]
 
 
-const Home: NextPage = () => {
+const Main: NextPage = () => {
   const router = useRouter();
   const [user, setUser] = useRecoilState(userState);
 
@@ -245,4 +245,4 @@ const TextSection = styled.div`
   }
 `
 
-export default Home;
+export default Main;
