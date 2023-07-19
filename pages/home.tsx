@@ -25,7 +25,11 @@ const Home: NextPage = () => {
     });
   }, [setUser])
 
-  return <>we good</>
+  return (
+    <>
+      {user && <p>we good</p>}
+    </>
+  )
 }
 
 export default Home;

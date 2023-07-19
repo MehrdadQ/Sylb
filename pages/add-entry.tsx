@@ -1,14 +1,18 @@
+import { onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+import Navbar from '../components/Navbar';
 import LoadingIcon from "../public/loading.svg";
 import { addCourseEntry } from '../utilities/api';
-import { loadingState } from '../utilities/atoms';
+import { loadingState, userState } from '../utilities/atoms';
+import { auth } from '../utilities/firebase';
 import { CourseData } from "../utilities/types";
 
 const semesterOptions = [
@@ -45,7 +49,7 @@ const semesterOptions = [
 
 const AddEntryPage: React.FC = () => {
   const [file, setFile] = useState<File | undefined | null>(undefined);
-  const [currentPage, setCurrentPage] = useState<number>(4);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [courseData, setCourseData] = useState<CourseData>({
     courseCode: '',
     professor: '',
@@ -61,7 +65,26 @@ const AddEntryPage: React.FC = () => {
     postTime: null,
     otherNotes: ''
   });
+
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
+  const [user, setUser] = useRecoilState(userState);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const uid = currentUser.uid;
+        setUser(uid)
+      } else {
+        goToLogin();
+      }
+    });
+  }, [setUser])
+
+  const goToLogin = () => {
+    router.push("/login")
+  }
 
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
@@ -188,6 +211,7 @@ const AddEntryPage: React.FC = () => {
 
   return (
     <>
+      <Navbar />
       <Container>
         <FormContainer onSubmit={handleSubmit}>
           {currentPage === 1 &&
@@ -439,7 +463,7 @@ const AddEntryPage: React.FC = () => {
         draggable
         pauseOnHover
         theme="dark"
-        />
+      />
     </>
   );
 };
