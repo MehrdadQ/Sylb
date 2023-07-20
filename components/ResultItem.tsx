@@ -1,3 +1,4 @@
+import router from 'next/router';
 import styled from 'styled-components';
 
 type ResultItemProps = {
@@ -5,11 +6,16 @@ type ResultItemProps = {
   professor: string,
   semester: string,
   backgroundColor?: string
+  entryID: string
 }
 
-const ResultItem = ({ courseCode, professor, semester, backgroundColor }: ResultItemProps) => {
+const ResultItem = ({ courseCode, professor, semester, backgroundColor, entryID }: ResultItemProps) => {
+  const goToInfoPage = (entryID: string) => {
+    router.push(`/entry/${entryID}`);
+  }
+
   return (
-    <Container style={{backgroundColor: backgroundColor}}>
+    <Container style={{backgroundColor: backgroundColor}} onClick={() => goToInfoPage(entryID)}>
       <CourseCode>{courseCode}</CourseCode>
       <Info style={{marginLeft: "auto"}}>{professor}</Info>
       <Info>{semester}</Info>

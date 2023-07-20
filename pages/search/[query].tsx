@@ -1,5 +1,6 @@
 import 'firebase/compat/storage';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,10 +8,9 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
 import ResultItem from '../../components/ResultItem';
+import LoadingIcon from "../../public/loading.svg";
 import { loadingState } from '../../utilities/atoms';
 import { firestore } from './../../utilities/firebase';
-import Image from 'next/image';
-import LoadingIcon from "../../public/loading.svg";
 
 
 interface SearchResult {
@@ -18,15 +18,15 @@ interface SearchResult {
   courseCode: string;
   semester: string;
   professor: string;
-  autofail: boolean;
-  courseAverage: 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'In progress';
-  courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Aynchronous' | 'In-person with Recorded Lectures' | "I Don't remember";
-  tutorials: 'Mandatory' | 'Optional but recommended' | 'Optional' | 'No Tutorials' | "I Don't remember";
-  hasEssay: boolean;
+  autofail: string;
+  courseAverage: string;
+  courseDelivery: string;
+  tutorials: string;
+  hasEssay: string;
   syllabusLink: string;
-  groupProjects: boolean;
+  groupProjects: string;
   courseWebsite: string;
-  postTime: Date | null;
+  postTime: Date | undefined;
   otherNotes: string;
 }
 
@@ -86,6 +86,7 @@ const SearchPage = () => {
             results.map((result, index) => (
               <ResultItem
                 key={result.id}
+                entryID={result.id}
                 courseCode={result.courseCode}
                 professor={result.professor}
                 semester={result.semester}

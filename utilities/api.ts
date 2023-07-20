@@ -3,9 +3,9 @@
 import { collection, addDoc } from 'firebase/firestore';
 
 import { auth, firestore } from './firebase';
-import { CourseData } from './types';
+import { EntryInfo } from './types';
 
-export const addCourseEntry = async (data: CourseData) => {
+export const addCourseEntry = async (data: EntryInfo) => {
   const collectionRef = collection(firestore, 'entries');
   await addDoc(collectionRef, data);
   const collectionRef2 = collection(firestore, 'courseCodes');

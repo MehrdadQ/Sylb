@@ -1,15 +1,16 @@
-export type CourseData = {
+export type EntryInfo = {
   courseCode: string;
-  semester: string | undefined;
   professor: string;
-  autofail: boolean | undefined;
+  semester: string | undefined;
+  autofail: 'Yes' | 'No' | undefined;
   courseAverage: 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'In progress' | undefined;
-  courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Aynchronous' | 'In-person with Recorded Lectures' | "I Don't remember" | undefined;
-  tutorials: 'Mandatory' | 'Optional but recommended' | 'Optional' | 'No Tutorials' | "I Don't remember" | undefined;
-  hasEssay: boolean | undefined;
+  courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Aynchronous' | 'In-person with Recorded Lectures' | undefined;
+  tutorials: 'Mandatory' | 'Optional but recommended' | 'Optional' | 'No Tutorials' | undefined;
+  hasEssay: 'Yes' | 'No' | undefined;
   syllabusLink: string;
-  groupProjects: boolean | undefined;
+  groupProjects: 'Yes' | 'No' | undefined;
   courseWebsite: string;
-  postTime: Date | null;
+  postTime: Date | undefined;
   otherNotes: string;
+  multipleChoice: 'All questions' | 'None' | 'Some but not all' | undefined;
 };

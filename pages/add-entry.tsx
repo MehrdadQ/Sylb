@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
@@ -13,7 +13,7 @@ import LoadingIcon from "../public/loading.svg";
 import { addCourseEntry } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
-import { CourseData } from "../utilities/types";
+import { EntryInfo } from "../utilities/types";
 
 const semesterOptions = [
   'Winter 2024',
@@ -50,7 +50,7 @@ const semesterOptions = [
 const AddEntryPage: React.FC = () => {
   const [file, setFile] = useState<File | undefined | null>(undefined);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [courseData, setCourseData] = useState<CourseData>({
+  const [courseData, setCourseData] = useState<EntryInfo>({
     courseCode: '',
     professor: '',
     semester: undefined,
@@ -62,14 +62,16 @@ const AddEntryPage: React.FC = () => {
     syllabusLink: '',
     groupProjects: undefined,
     courseWebsite: '',
-    postTime: null,
-    otherNotes: ''
+    postTime: undefined,
+    otherNotes: '',
+    multipleChoice: undefined,
   });
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
   const [user, setUser] = useRecoilState(userState);
 
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
@@ -88,14 +90,12 @@ const AddEntryPage: React.FC = () => {
 
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
-      const { courseCode, semester, professor, courseAverage, courseDelivery, tutorials } = courseData;
-      return courseCode !== undefined && semester !== undefined && professor !== undefined && 
-        courseAverage !== undefined && courseDelivery !== undefined && tutorials !== undefined;
+      const { courseCode, semester, professor, courseAverage } = courseData;
+      return courseCode !== '' && semester !== undefined && professor !== '' && 
+        courseAverage !== undefined;
     }
     if (currentPage === 2) {
-      const { autofail, hasEssay, groupProjects } = courseData;
-      return autofail !== undefined && hasEssay !== undefined && groupProjects !== undefined && 
-        file !== undefined && file !== null;
+      return file !== undefined && file !== null;
     }
     if (currentPage === 3) {
       return true;
@@ -135,18 +135,31 @@ const AddEntryPage: React.FC = () => {
       professor: '',
       semester: undefined,
       courseDelivery: undefined,
+      courseAverage: undefined,
       tutorials: undefined,
       autofail: undefined,
-      courseAverage: undefined,
       hasEssay: undefined,
       syllabusLink: '',
       groupProjects: undefined,
       courseWebsite: '',
-      postTime: null,
-      otherNotes: ''
+      postTime: undefined,
+      otherNotes: '',
+      multipleChoice: undefined,
     });
     setFile(undefined);
     setCurrentPage(1);
+  }
+
+  function replaceUndefinedWithEmptyString<T>(obj: T): T {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key as keyof T];
+        if (value === undefined) {
+          obj[key as keyof T] = '' as any;
+        }
+      }
+    }
+    return obj;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -158,7 +171,9 @@ const AddEntryPage: React.FC = () => {
       if (!downloadURL) {
         throw new Error();
       }
-      const updatedCourseData = { ...courseData, postTime: new Date(), syllabusLink: downloadURL };
+      
+      const updatedCourseData: EntryInfo =
+        replaceUndefinedWithEmptyString({ ...courseData, postTime: new Date(), syllabusLink: downloadURL });
       await addCourseEntry(updatedCourseData);
     }
 
@@ -174,7 +189,17 @@ const AddEntryPage: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
-    setFile(file);
+
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toastError("File size exceeds the limit. Please upload a file up to 5MB.");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+        setFile(file);
+      }
+    }
   };
 
   const handleFileUpload = async () => {
@@ -217,9 +242,9 @@ const AddEntryPage: React.FC = () => {
           {currentPage === 1 &&
             <>
               <Form.Group controlId="courseCode">
-                <StyledFormLabel>Course Code</StyledFormLabel>
+                <StyledFormLabel>Course Code *</StyledFormLabel>
                 <Form.Control
-                  placeholder='Enter Course Code'
+                  placeholder='Enter Course Code (requried)'
                   size='sm'
                   type="text"
                   name="courseCode"
@@ -229,7 +254,7 @@ const AddEntryPage: React.FC = () => {
               </Form.Group>
 
               <Form.Group controlId="semester">
-                <StyledFormLabel>Semester</StyledFormLabel>
+                <StyledFormLabel>Semester *</StyledFormLabel>
                 <Form.Select
                   size='sm'
                   value={courseData.semester}
@@ -239,7 +264,7 @@ const AddEntryPage: React.FC = () => {
                     setCourseData({ ...courseData, semester: parsedValue });
                   }}
                 >
-                  <option value="undefined">When did you take this course?</option>
+                  <option value="undefined">When did you take this course? (requried)</option>
                   {semesterOptions.map((semester) => (
                     <option key={semester} value={semester}>
                       {semester}
@@ -249,9 +274,9 @@ const AddEntryPage: React.FC = () => {
               </Form.Group>
 
               <Form.Group controlId="professor">
-                <StyledFormLabel>Professor</StyledFormLabel>
+                <StyledFormLabel>Professor *</StyledFormLabel>
                 <Form.Control
-                  placeholder='Enter Professor Full Name'
+                  placeholder='Enter Professor Full Name (requried)'
                   size='sm'
                   type="text"
                   name="professor"
@@ -261,17 +286,17 @@ const AddEntryPage: React.FC = () => {
               </Form.Group>
               
               <Form.Group controlId="courseAverage">
-                <StyledFormLabel>Course Average</StyledFormLabel>
+                <StyledFormLabel>Course Average *</StyledFormLabel>
                 <Form.Select
                   size='sm'
                   value={courseData.courseAverage}
                   onChange={(e) => {
                     const value = e.target.value;
                     const parsedValue = value === "undefined" ? undefined : value;
-                    setCourseData({ ...courseData, courseAverage: parsedValue as CourseData['courseAverage'] });
+                    setCourseData({ ...courseData, courseAverage: parsedValue as EntryInfo['courseAverage'] });
                   }}    
                 >
-                  <option value="undefined">What was the course average?</option>
+                  <option value="undefined">What was the course average? (requried)</option>
                   <option value="A+">A+</option>
                   <option value="A">A</option>
                   <option value="A-">A-</option>
@@ -296,7 +321,7 @@ const AddEntryPage: React.FC = () => {
                   onChange={(e) => {
                     const value = e.target.value;
                     const parsedValue = value === "undefined" ? undefined : value;
-                    setCourseData({ ...courseData, courseDelivery: parsedValue as CourseData['courseDelivery']});
+                    setCourseData({ ...courseData, courseDelivery: parsedValue as EntryInfo['courseDelivery']});
                   }}    
                 >
                   <option value="undefined">What was the course delivery type?</option>
@@ -304,7 +329,6 @@ const AddEntryPage: React.FC = () => {
                   <option value="In-person with Recorded Lectures">In-person with Recorded Lectures</option>
                   <option value="Online Synchronous">Online Synchronous</option>
                   <option value="Online Asynchronous">Online Asynchronous</option>
-                  <option value="I Don't remember">I Don&apos;t remember</option>
                 </Form.Select>
               </Form.Group>
 
@@ -316,7 +340,7 @@ const AddEntryPage: React.FC = () => {
                   onChange={(e) => {
                     const value = e.target.value;
                     const parsedValue = value === "undefined" ? undefined : value;
-                    setCourseData({ ...courseData, tutorials: parsedValue as CourseData['tutorials']});
+                    setCourseData({ ...courseData, tutorials: parsedValue as EntryInfo['tutorials']});
                   }}
                 >
                   <option value="undefined">Select tutorial type</option>
@@ -324,7 +348,6 @@ const AddEntryPage: React.FC = () => {
                   <option value="Optional but recommended">Optional but recommended</option>
                   <option value="Optional">Optional</option>
                   <option value="No Tutorials">No Tutorials</option>
-                  <option value="I Don't remember">I Don&apos;t remember</option>
                 </Form.Select>
               </Form.Group>
             </>
@@ -333,8 +356,8 @@ const AddEntryPage: React.FC = () => {
           {currentPage === 2 &&
             <>
               <SingleColumnFormGroup  controlId="syllabusFile">
-                <StyledFormLabel>Syllabus File (PDF or DOCX)</StyledFormLabel>
-                <Form.Control type="file" onChange={handleFileChange} accept=".pdf,.docx" />
+                <StyledFormLabel>Syllabus File (PDF or DOCX) *</StyledFormLabel>
+                <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf,.docx" />
               </SingleColumnFormGroup>
 
               <SingleColumnFormGroup controlId="autofail">
@@ -344,13 +367,13 @@ const AddEntryPage: React.FC = () => {
                   value={courseData.autofail ? courseData.autofail.toString() : undefined}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value === 'true';
-                    setCourseData({ ...courseData, autofail: parsedValue });
+                    const parsedValue = value === "undefined" ? undefined : value;
+                    setCourseData({ ...courseData, autofail: parsedValue as EntryInfo["autofail"] });
                   }}
                 >
                   <option value="undefined">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
                 </Form.Select>
               </SingleColumnFormGroup>
 
@@ -361,13 +384,13 @@ const AddEntryPage: React.FC = () => {
                   value={courseData.hasEssay ? courseData.hasEssay.toString() : undefined}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value === 'true';
-                    setCourseData({ ...courseData, hasEssay: parsedValue });
+                    const parsedValue = value === "undefined" ? undefined : value
+                    setCourseData({ ...courseData, hasEssay: parsedValue as EntryInfo["hasEssay"] });
                   }}
                 >
                   <option value="undefined">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
                 </Form.Select>
               </SingleColumnFormGroup>
 
@@ -379,13 +402,34 @@ const AddEntryPage: React.FC = () => {
                     value={courseData.groupProjects ? courseData.groupProjects.toString() : undefined}
                     onChange={(e) => {
                       const value = e.target.value;
-                      const parsedValue = value === "undefined" ? undefined : value === 'true';
-                      setCourseData({ ...courseData, groupProjects: parsedValue });
+                      const parsedValue = value === "undefined" ? undefined : value;
+                      setCourseData({ ...courseData, groupProjects: parsedValue as EntryInfo["groupProjects"]  });
                     }}
                   >
                     <option value="undefined">Select</option>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </Form.Select>
+                </InputGroup>
+              </SingleColumnFormGroup>
+
+              <SingleColumnFormGroup controlId="groupProjects">
+                <StyledFormLabel>Were the questions on tests/exams multiple choice?</StyledFormLabel>
+                <InputGroup>
+                  <Form.Select
+                    size='sm'
+                    value={courseData.multipleChoice ? courseData.multipleChoice.toString() : undefined}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const parsedValue = value === "undefined" ? undefined : value;
+                      setCourseData({ ...courseData, multipleChoice: parsedValue as EntryInfo['multipleChoice']});
+                    }}
+                  >
+                    <option value="undefined">Select</option>
+                    <option value="All questions">All questions</option>
+                    <option value="Some but not all">Some but not all</option>
+                    <option value="None">None</option>
+                    <option value="No Tutorials">No Tutorials</option>
                   </Form.Select>
                 </InputGroup>
               </SingleColumnFormGroup>
@@ -395,7 +439,7 @@ const AddEntryPage: React.FC = () => {
           {currentPage === 3 &&
             <>
               <SingleColumnFormGroup controlId="courseWebsite">
-                <StyledFormLabel>Course Website (optional)</StyledFormLabel>
+                <StyledFormLabel>Course Website</StyledFormLabel>
                 <Form.Control
                   placeholder='Enter course website if there is one'
                   size='sm'
@@ -407,7 +451,7 @@ const AddEntryPage: React.FC = () => {
               </SingleColumnFormGroup>
 
               <SingleColumnFormGroup controlId="otherNotes">
-                <StyledFormLabel>Any other notes or comments? (optional)</StyledFormLabel>
+                <StyledFormLabel>Any other notes or comments?</StyledFormLabel>
                 <Form.Control
                   placeholder='Anything else others should know?'
                   size='sm'
