@@ -83,16 +83,26 @@ const SearchPage = () => {
             <SearchTitle>Search Results for: {searchQuery.toUpperCase()}</SearchTitle>
             {results.length == 0 ? 
             <NoResultsMessage>Unfortunately, there were no results for {searchQuery.toUpperCase()} 😢</NoResultsMessage> :
-            results.map((result, index) => (
+            <>
+            <ResultItem
+              key={"header"}
+              entryID={'header'.toUpperCase()}
+              courseCode={"Course Code".toUpperCase()}
+              professor={"Professor".toUpperCase()}
+              semester={"Semester".toUpperCase()}
+              backgroundColor={'#0f2649'}
+            />
+            {results.map((result, index) => (
               <ResultItem
                 key={result.id}
                 entryID={result.id}
                 courseCode={result.courseCode}
                 professor={result.professor}
                 semester={result.semester}
-                backgroundColor={index % 2 == 0 ? '' : '#3c475c'}
+                backgroundColor={index % 2 == 0 ? '' : '#112c55'}
               />
-            ))
+            ))}
+            </>
             }
           </ResultsContainer>
           <ToastContainer
@@ -120,10 +130,13 @@ const SearchTitle = styled.h3`
 `;
 
 const ResultsContainer = styled.div`
-  margin: 1rem 10rem;
   display: flex;
   flex-direction: column;
-  @media (max-width: 1000px) {
+  margin: 1rem 30rem;
+  @media (max-width: 1700px) {
+    margin: 1rem 20rem;
+  }
+  @media (max-width: 1400px) {
     margin: 1rem 6rem;
   }
   @media (max-width: 700px) {

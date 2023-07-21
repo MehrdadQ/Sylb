@@ -148,13 +148,15 @@ const SearchPage = () => {
               {info?.courseDelivery !== "" && <EntryInfo><Bold>📅 Course Delivery:</Bold> {info?.courseDelivery}</EntryInfo>}
               {info?.tutorials !== "" && <EntryInfo><Bold>📚 Tutorials:</Bold> {info?.tutorials}</EntryInfo>}
               {info?.groupProjects !== "" && <EntryInfo><Bold>👥 Group Projects:</Bold> {info?.groupProjects}</EntryInfo>}
-              {info?.hasEssay !== "" && <EntryInfo><Bold>📝 Has Essay:</Bold> {info?.hasEssay}</EntryInfo>}
+              {info?.hasEssay !== "" && <EntryInfo><Bold>📝 Essays:</Bold> {info?.hasEssay}</EntryInfo>}
               {info?.autofail !== "" && <EntryInfo><Bold>⛔️ Exam Autofail:</Bold> {info?.autofail}</EntryInfo>}
               {info?.courseWebsite !== "" && <EntryInfo><Bold>🌐 Course Website:</Bold> <a href={info?.courseWebsite} target='_blank'>Link to website</a></EntryInfo>}
               {info?.otherNotes !== "" && <EntryInfo><Bold>📌 Other Notes:</Bold> {info?.otherNotes}</EntryInfo>}
-              {info?.otherNotes !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
+              {info?.multipleChoice !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
             </BottomSection>
-            <Button onClick={() => handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`)}>Download Syllabus 📜</Button>
+            <Button onClick={() => handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`)}>
+              Download Syllabus 📜
+            </Button>
             <TimeAgo>{timeAgo(info?.postTime)}</TimeAgo>
           </ResultsContainer>
           <ToastContainer
@@ -252,7 +254,7 @@ const Button = styled.button`
   cursor: pointer;
   display: inline-block;
   font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 20px;
   margin: 0;

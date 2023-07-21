@@ -15,38 +15,54 @@ const ResultItem = ({ courseCode, professor, semester, backgroundColor, entryID 
   }
 
   return (
-    <Container style={{backgroundColor: backgroundColor}} onClick={() => goToInfoPage(entryID)}>
+    <Container
+      style={{
+        backgroundColor: entryID === "HEADER" ? "#0A121E" : backgroundColor,
+        fontWeight: entryID === "HEADER" ? 700 : 200,
+        cursor: entryID === "HEADER" ? 'auto' : 'pointer'
+      }}
+      onClick={entryID === "HEADER" ? () => null : () => goToInfoPage(entryID)}
+    >
       <CourseCode>{courseCode}</CourseCode>
-      <Info style={{marginLeft: "auto"}}>{professor}</Info>
+      <Info>{professor}</Info>
       <Info>{semester}</Info>
     </Container>
   )
 }
 
 const Container = styled.div`
+  color: #ededee;
   display: flex;
+  text-align: center;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 1rem;
   border: 1px solid gray;
   position: relative;
   width: 100%;
+  cursor: pointer;
+  background-color: #0f2649;
+  border: none;
+  @media (max-width: 700px) {
+    font-size: 14px;
+  }
 `;
 
 const CourseCode = styled.div`
-  font-weight: 700;
-  text-align: center;
+  width: 40%;
+  @media (max-width: 700px) {
+    width: 33%;
+    padding: 0;
+  }
 `;
 
 const Info = styled.div`
   width: 20%;
-  text-align: center;
-  @media (max-width: 1000px) {
-    width: 30%;
-  }
+  padding: 0 1rem;
   @media (max-width: 700px) {
     width: 33%;
+    padding: 0
   }
 `;
 
