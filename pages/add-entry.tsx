@@ -173,7 +173,7 @@ const AddEntryPage: React.FC = () => {
       }
       
       const updatedCourseData: EntryInfo =
-        replaceUndefinedWithEmptyString({ ...courseData, postTime: new Date(), syllabusLink: downloadURL });
+        replaceUndefinedWithEmptyString({ ...courseData, postTime: new Date().getTime(), syllabusLink: downloadURL });
       await addCourseEntry(updatedCourseData);
     }
 
@@ -429,7 +429,6 @@ const AddEntryPage: React.FC = () => {
                     <option value="All questions">All questions</option>
                     <option value="Some but not all">Some but not all</option>
                     <option value="None">None</option>
-                    <option value="No Tutorials">No Tutorials</option>
                   </Form.Select>
                 </InputGroup>
               </SingleColumnFormGroup>

@@ -10,7 +10,7 @@ export type EntryInfo = {
   syllabusLink: string;
   groupProjects: 'Yes' | 'No' | undefined;
   courseWebsite: string;
-  postTime: Date | undefined;
+  postTime: Date | number | undefined;
   otherNotes: string;
   multipleChoice: 'All questions' | 'None' | 'Some but not all' | undefined;
 };
