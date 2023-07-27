@@ -135,7 +135,10 @@ const SearchPage = () => {
       <Navbar />
       {isLoading || !entryID ?
         <LoadingImage src={LoadingIcon} alt='loading'/> : notFound ?
-        <p> not found </p> :
+        <NotFound>
+          <p>Oops! This link seems to be broken.</p>
+          <p>It&apos;s possible the submission was deleted or is no longer available. Feel free to try a search instead.</p>
+        </NotFound> :
         <>
           <ResultsContainer>
             <TopSection>
@@ -243,6 +246,28 @@ const ResultsContainer = styled.div`
     margin: 1rem;
   }
 `;
+
+const NotFound = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem;
+
+  p {
+    font-size: 30px;
+    width: 60%;
+  }
+
+  @media (max-width: 1000px) {
+    padding: 1rem;
+
+    p {
+      font-size: 20px;
+      width: 90%;
+    }
+  }
+`
 
 const Button = styled.button`
   grid-column: 1 / -1;
