@@ -4,7 +4,7 @@ import 'firebase/compat/storage';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -12,8 +12,10 @@ import Navbar from '../components/Navbar';
 import LoadingIcon from "../public/loading.svg";
 import { addCourseEntry } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
-import { auth } from '../utilities/firebase';
-import { EntryInfo } from "../utilities/types";
+import { auth, firestore } from '../utilities/firebase';
+import { EntryInfo, SearchResult } from "../utilities/types";
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import Rodal from 'rodal';
 
 const semesterOptions = [
   'Winter 2024',
@@ -66,6 +68,7 @@ const AddEntryPage: React.FC = () => {
     otherNotes: '',
     multipleChoice: undefined,
   });
+  const [duplicateID, setDuplicateID] = useState<string|null>(null);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
   const [user, setUser] = useRecoilState(userState);
@@ -74,6 +77,9 @@ const AddEntryPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const goToLogin = () => {
+      router.push("/login")
+    }
     onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
@@ -83,16 +89,18 @@ const AddEntryPage: React.FC = () => {
       }
     });
   }, [setUser])
-
-  const goToLogin = () => {
-    router.push("/login")
-  }
+  
+  const goToEntry = (entryID: string | null) => {
+    if (entryID) {
+      window.open(`/entry/${entryID}`, '_blank');
+    }
+  };
 
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
       const { courseCode, semester, professor, courseAverage } = courseData;
       return courseCode !== '' && semester !== undefined && professor !== '' && 
-        courseAverage !== undefined;
+        courseAverage !== null;
     }
     if (currentPage === 2) {
       return file !== undefined && file !== null;
@@ -216,13 +224,40 @@ const AddEntryPage: React.FC = () => {
     }
   };
 
-  const goNextPage = (e: React.FormEvent | null) => {
+  const alreadyExists = async () => {
+    const { courseCode, semester, professor } = courseData;
+    const entriesRef = collection(firestore, 'entries');
+    const q = query(entriesRef, 
+      where('courseCode', '==', courseCode),
+      where('semester', '==', semester),
+      where('professor', '==', professor)
+    );
+
+    try {
+      const snapshot = await getDocs(q);
+      const isDuplicate = snapshot.docs.length > 0;
+      if (isDuplicate) {
+        setDuplicateID(snapshot.docs[0].id);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error searching for duplicates:', error);
+    }
+    return false;
+  };
+
+  
+  const goNextPage = async (e: React.FormEvent | null) => {
     if (e) e.preventDefault();
     if (currentPage === 1) {
       const regex = /^[A-Z]{3}[A-Z0-9]{3,5}$/;
       if (!regex.test(courseData.courseCode)) {
         toastError("Oops! It looks like the course code might be incorrect. \
           Take a moment to double-check and make sure it's entered correctly.");
+        return;
+      }
+
+      if (await alreadyExists()) {
         return;
       }
     }
@@ -286,17 +321,17 @@ const AddEntryPage: React.FC = () => {
               </Form.Group>
               
               <Form.Group controlId="courseAverage">
-                <StyledFormLabel>Course Average *</StyledFormLabel>
+                <StyledFormLabel>Course Average</StyledFormLabel>
                 <Form.Select
                   size='sm'
                   value={courseData.courseAverage}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value;
+                    const parsedValue = value === "undefined" ? undefined : value === "null" ? null : value;
                     setCourseData({ ...courseData, courseAverage: parsedValue as EntryInfo['courseAverage'] });
                   }}    
                 >
-                  <option value="undefined">What was the course average? (requried)</option>
+                  <option value="null">What was the course average?</option>
                   <option value="A+">A+</option>
                   <option value="A">A</option>
                   <option value="A-">A-</option>
@@ -310,6 +345,7 @@ const AddEntryPage: React.FC = () => {
                   <option value="D">D</option>
                   <option value="D-">D-</option>
                   <option value="In progress">In progress</option>
+                  <option value="undefined">Not sure...</option>
                 </Form.Select>
               </Form.Group>
 
@@ -507,6 +543,18 @@ const AddEntryPage: React.FC = () => {
         pauseOnHover
         theme="dark"
       />
+      <Modal
+        show={duplicateID !== null}
+        onHide={() => setDuplicateID(null)}
+        centered
+        style={{color: 'black'}}
+      >
+        <Modal.Body>
+          An entry for <TextBold>{courseData.courseCode}</TextBold> with <TextBold>{courseData.professor}</TextBold>{' '}
+          for <TextBold>{courseData.semester}</TextBold> already exists.
+          You can access it <NavLink onClick={() => goToEntry(duplicateID)}>HERE.</NavLink>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
@@ -658,7 +706,17 @@ const Button = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
   }
-`
+`;
+
+const NavLink = styled.a`
+  color: #2792c4;
+  cursor: pointer;
+`;
+
+const TextBold = styled.div`
+  font-weight: 600;
+  display: inline-block;
+`;
 
 
 export default AddEntryPage;

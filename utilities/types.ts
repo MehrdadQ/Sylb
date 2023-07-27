@@ -14,3 +14,20 @@ export type EntryInfo = {
   otherNotes: string;
   multipleChoice: 'All questions' | 'None' | 'Some but not all' | undefined;
 };
+
+export type SearchResult = {
+  id: string;
+  courseCode: string;
+  semester: string;
+  professor: string;
+  autofail: string;
+  courseAverage: string;
+  courseDelivery: string;
+  tutorials: string;
+  hasEssay: string;
+  syllabusLink: string;
+  groupProjects: string;
+  courseWebsite: string;
+  postTime: Date | undefined;
+  otherNotes: string;
+}

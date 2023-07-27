@@ -1,19 +1,18 @@
+import axios from 'axios';
+import { onAuthStateChanged } from "firebase/auth";
 import 'firebase/compat/storage';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import fileDownload from 'js-file-download';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
-import ResultItem from '../../components/ResultItem';
-import { loadingState } from '../../utilities/atoms';
-import { firestore } from '../../utilities/firebase';
-import Image from 'next/image';
 import LoadingIcon from "../../public/loading.svg";
-import { doc, getDoc } from 'firebase/firestore';
-import axios from 'axios'
-import fileDownload from 'js-file-download'
+import { loadingState, userState } from '../../utilities/atoms';
+import { auth, firestore } from '../../utilities/firebase';
 
 
 interface Info {
@@ -42,6 +41,22 @@ const SearchPage = () => {
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
 
   const { entryID: entryID } = router.query as { entryID: string };
+
+  const [user, setUser] = useRecoilState(userState);
+  
+  useEffect(() => {
+    const goToLogin = () => {
+      router.push("/login")
+    }
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const uid = currentUser.uid;
+        setUser(uid)
+      } else {
+        goToLogin();
+      }
+    });
+  }, [setUser, router])
 
   const getEntryById = async (entryId: string) => {
     const entryRef = doc(firestore, 'entries', entryId); // 'entries' is the name of your Firestore collection
@@ -104,8 +119,6 @@ const SearchPage = () => {
     }
     const now = new Date().getTime();
     const time = new Date(date).getTime();
-    console.log(new Date())
-    console.log(date)
     const diff = now - time;
   
     const minute = 60 * 1000;
@@ -147,15 +160,15 @@ const SearchPage = () => {
             </TopSection>
             <BottomSection>
               <EntryInfo><Bold>👨‍🏫 Professor:</Bold> {info?.professor}</EntryInfo>
-              <EntryInfo><Bold>🎯 Course Average:</Bold> {info?.courseAverage}</EntryInfo>
+              {info?.courseAverage !== "" && <EntryInfo><Bold>🎯 Course Average:</Bold> {info?.courseAverage}</EntryInfo>}
               {info?.courseDelivery !== "" && <EntryInfo><Bold>📅 Course Delivery:</Bold> {info?.courseDelivery}</EntryInfo>}
               {info?.tutorials !== "" && <EntryInfo><Bold>📚 Tutorials:</Bold> {info?.tutorials}</EntryInfo>}
               {info?.groupProjects !== "" && <EntryInfo><Bold>👥 Group Projects:</Bold> {info?.groupProjects}</EntryInfo>}
               {info?.hasEssay !== "" && <EntryInfo><Bold>📝 Essays:</Bold> {info?.hasEssay}</EntryInfo>}
               {info?.autofail !== "" && <EntryInfo><Bold>⛔️ Exam Autofail:</Bold> {info?.autofail}</EntryInfo>}
+              {info?.multipleChoice !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
               {info?.courseWebsite !== "" && <EntryInfo><Bold>🌐 Course Website:</Bold> <a href={info?.courseWebsite} target='_blank'>Link to website</a></EntryInfo>}
               {info?.otherNotes !== "" && <EntryInfo><Bold>📌 Other Notes:</Bold> {info?.otherNotes}</EntryInfo>}
-              {info?.multipleChoice !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
             </BottomSection>
             <Button onClick={() => handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`)}>
               Download Syllabus 📜

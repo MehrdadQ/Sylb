@@ -10,6 +10,10 @@ const CustomNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
+  const goToAddEntryPage = () => {
+    router.push('/add-entry')
+  } 
+
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchQuery.trim() !== "") {
@@ -19,7 +23,7 @@ const CustomNavbar = () => {
 
   return (
     <Sticky>
-      <Navbar>
+      <Navbar expand="sm" variant='dark'>
         <Navbar.Brand href="#">
           <Image
             src="../../logo.svg"
@@ -32,6 +36,7 @@ const CustomNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <FormContainer>
+          <NavButton onClick={goToAddEntryPage}>Add your syllabus</NavButton>
             <Form className="d-flex" onSubmit={handleSearch}>
                 <Form.Control
                   type="search"
@@ -67,8 +72,30 @@ const FormContainer = styled.div`
   display: flex;
 `;
 
+const NavButton = styled(Button)`
+  background-color: #488ED8;
+  border-color: #488ED8 !important;
+  color: #ededee !important;
+  margin-right: 1rem;
+  &:hover {
+    background-color: #2c82df !important;
+    border-color: #488ED8 !important;
+    color: white !important;
+  }
+  &:active {
+    background-color: #488ED8 !important;
+    border-color: #488ED8 !important;
+    color: white !important;
+  }
+  &:focus-visible {
+    background-color: #488ED8 !important;
+    border-color: #488ED8 !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.15rem rgba(255,255,255,0.7);
+  }
+`;
+
 const SearchButton = styled(Button)`
-  /* background-color: #488ED8; */
   border-color: #488ED8 !important;
   color: #488ED8 !important;
   &:hover {

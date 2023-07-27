@@ -10,25 +10,8 @@ import Navbar from '../../components/Navbar';
 import ResultItem from '../../components/ResultItem';
 import LoadingIcon from "../../public/loading.svg";
 import { loadingState } from '../../utilities/atoms';
+import { SearchResult } from '../../utilities/types';
 import { firestore } from './../../utilities/firebase';
-
-
-interface SearchResult {
-  id: string;
-  courseCode: string;
-  semester: string;
-  professor: string;
-  autofail: string;
-  courseAverage: string;
-  courseDelivery: string;
-  tutorials: string;
-  hasEssay: string;
-  syllabusLink: string;
-  groupProjects: string;
-  courseWebsite: string;
-  postTime: Date | undefined;
-  otherNotes: string;
-}
 
 const SearchPage = () => {
   const router = useRouter();
@@ -58,7 +41,7 @@ const SearchPage = () => {
       };
       searchFirestore();
     }
-  }, [searchQuery]);
+  }, [searchQuery, setIsLoading]);
 
   const toastError = (errorMessage: string) => {
     toast.error(errorMessage, {
