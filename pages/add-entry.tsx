@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -13,41 +14,7 @@ import LoadingIcon from "../public/loading.svg";
 import { addCourseEntry } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from '../utilities/firebase';
-import { EntryInfo, SearchResult } from "../utilities/types";
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import Rodal from 'rodal';
-
-const semesterOptions = [
-  'Winter 2024',
-  'Summer 2024',
-  'Fall 2024',
-  'Winter 2023',
-  'Summer 2023',
-  'Fall 2023',
-  'Winter 2022',
-  'Summer 2022',
-  'Fall 2022',
-  'Winter 2021',
-  'Summer 2021',
-  'Fall 2021',
-  'Winter 2020',
-  'Summer 2020',
-  'Fall 2020',
-  'Winter 2019',
-  'Summer 2019',
-  'Fall 2019',
-  'Winter 2018',
-  'Summer 2018',
-  'Fall 2018',
-  'Winter 2017',
-  'Summer 2017',
-  'Fall 2017',
-  'Winter 2016',
-  'Summer 2016',
-  'Fall 2016',
-  'Winter 2015',
-  'Older'
-];
+import { EntryInfo, semesterOptions } from "../utilities/types";
 
 const AddEntryPage: React.FC = () => {
   const [file, setFile] = useState<File | undefined | null>(undefined);
@@ -93,6 +60,11 @@ const AddEntryPage: React.FC = () => {
   const goToEntry = (entryID: string | null) => {
     if (entryID) {
       window.open(`/entry/${entryID}`, '_blank');
+    }
+  };
+  const goToEdit = (entryID: string | null) => {
+    if (entryID) {
+      window.open(`/suggest-edit/${entryID}`, '_blank');
     }
   };
 
@@ -251,7 +223,7 @@ const AddEntryPage: React.FC = () => {
     if (e) e.preventDefault();
     if (currentPage === 1) {
       const regex = /^[A-Z]{3}[A-Z0-9]{3,5}$/;
-      if (!regex.test(courseData.courseCode)) {
+      if (courseData.courseCode && !regex.test(courseData.courseCode)) {
         toastError("Oops! It looks like the course code might be incorrect. \
           Take a moment to double-check and make sure it's entered correctly.");
         return;
@@ -553,6 +525,8 @@ const AddEntryPage: React.FC = () => {
           An entry for <TextBold>{courseData.courseCode}</TextBold> with <TextBold>{courseData.professor}</TextBold>{' '}
           for <TextBold>{courseData.semester}</TextBold> already exists.
           You can access it <NavLink onClick={() => goToEntry(duplicateID)}>HERE.</NavLink>
+          <br/><br/>If you think the information on that page is not accurate, you can make edit requests{' '}
+          <NavLink onClick={() => goToEdit(duplicateID)}>HERE.</NavLink>
         </Modal.Body>
       </Modal>
     </>

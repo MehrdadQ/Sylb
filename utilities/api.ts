@@ -11,3 +11,8 @@ export const addCourseEntry = async (data: EntryInfo) => {
   const collectionRef2 = collection(firestore, 'courseCodes');
   await addDoc(collectionRef2, {courseCode: data.courseCode});
 };
+
+export const requestEntryUpdate = async (data: any) => {
+  const collectionRef = collection(firestore, 'updateRequests');
+  await addDoc(collectionRef, data);
+}

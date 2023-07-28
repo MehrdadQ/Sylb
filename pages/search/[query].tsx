@@ -10,12 +10,12 @@ import Navbar from '../../components/Navbar';
 import ResultItem from '../../components/ResultItem';
 import LoadingIcon from "../../public/loading.svg";
 import { loadingState } from '../../utilities/atoms';
-import { SearchResult } from '../../utilities/types';
+import { EntryResultInfo } from '../../utilities/types';
 import { firestore } from './../../utilities/firebase';
 
 const SearchPage = () => {
   const router = useRouter();
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<EntryResultInfo[]>([]);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
 
@@ -31,7 +31,7 @@ const SearchPage = () => {
         
         try {
           const snapshot = await getDocs(q);
-          const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SearchResult));
+          const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as EntryResultInfo));
           setResults(data);
           setIsLoading(false)
         } catch (error) {

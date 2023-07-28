@@ -13,29 +13,13 @@ import Navbar from '../../components/Navbar';
 import LoadingIcon from "../../public/loading.svg";
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth, firestore } from '../../utilities/firebase';
+import { EntryResultInfo } from '../../utilities/types'
 
 
-interface Info {
-  id: string;
-  courseCode: string;
-  semester: string;
-  professor: string;
-  autofail: string;
-  courseAverage: string;
-  courseDelivery: string;
-  tutorials: string;
-  hasEssay: string;
-  syllabusLink: string;
-  groupProjects: string;
-  courseWebsite: string;
-  postTime: Date | null;
-  otherNotes: string;
-  multipleChoice: string;
-}
 
 const SearchPage = () => {
   const router = useRouter();
-  const [info, setInfo] = useState<Info | null>(null);
+  const [info, setInfo] = useState<EntryResultInfo | null>(null);
   const [notFound, setNotFound] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
@@ -58,8 +42,12 @@ const SearchPage = () => {
     });
   }, [setUser, router])
 
+  const goToEdit = (id: string) => {
+    router.push(`/suggest-edit/${id}`)
+  }
+
   const getEntryById = async (entryId: string) => {
-    const entryRef = doc(firestore, 'entries', entryId); // 'entries' is the name of your Firestore collection
+    const entryRef = doc(firestore, 'entries', entryId);
   
     try {
       const entrySnapshot = await getDoc(entryRef);
@@ -78,7 +66,7 @@ const SearchPage = () => {
 
   const getEntryData = async () => {
     const data = await getEntryById(entryID);
-    setInfo(data as Info);
+    setInfo(data as EntryResultInfo);
     setIsLoading(false);
     return data;
   };
@@ -173,7 +161,10 @@ const SearchPage = () => {
             <Button onClick={() => handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`)}>
               Download Syllabus 📜
             </Button>
-            <TimeAgo>{timeAgo(info?.postTime)}</TimeAgo>
+            <Footer>
+              <p className='link' onClick={() => goToEdit(entryID)}>Suggest changes to this submission</p>
+              <p>{timeAgo(info?.postTime)}</p>
+            </Footer>
           </ResultsContainer>
           <ToastContainer
             position="top-right"
@@ -223,11 +214,6 @@ const EntryInfo = styled.p`
 const Semester = styled.p`
   margin: 0;
   font-size: 18px
-`;
-
-const TimeAgo = styled.p`
-  float: right;
-  padding-top: 0.5rem;
 `;
 
 const Bold = styled.div`
@@ -335,6 +321,37 @@ const LoadingImage = styled(Image)`
   position: absolute;
   top: 50%;
   left: 50%;
+`;
+
+const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+
+  p {
+    padding-top: 0.5rem;
+  }
+  
+  .link {
+    padding-top: 0.5rem;
+    color: #7bb2ec;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (max-width: 500px) {
+    flex-direction: column-reverse;
+    .link {
+      padding: 0;
+      margin: 0;
+    }
+    
+    p {
+      padding-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  }
 `;
 
 export default SearchPage;
