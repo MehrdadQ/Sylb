@@ -36,7 +36,7 @@ const CustomNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <FormContainer>
-          <NavButton onClick={goToAddEntryPage}>Add your syllabus</NavButton>
+            <NavButton onClick={goToAddEntryPage}>Add your syllabus</NavButton>
             <Form className="d-flex" onSubmit={handleSearch}>
                 <Form.Control
                   type="search"

@@ -28,9 +28,16 @@ export type EntryResultInfo = {
   syllabusLink: string;
   groupProjects: string;
   courseWebsite: string;
-  postTime: Date | null;
+  postTime: Date | number | null;
   otherNotes: string;
   multipleChoice: string;
+}
+
+export type EntryResultInfoCompact = {
+  id: string;
+  courseCode: string;
+  semester: string;
+  postTime: Date | number | null;
 }
 
 export const semesterOptions = [

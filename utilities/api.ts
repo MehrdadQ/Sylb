@@ -1,7 +1,7 @@
 
-import { addDoc, collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy } from 'firebase/firestore';
 import { firestore } from './firebase';
-import { EntryInfo, EntryResultInfo } from './types';
+import { EntryInfo, EntryResultInfo, EntryResultInfoCompact } from './types';
 
 export const addCourseEntry = async (data: EntryInfo) => {
   const collectionRef = collection(firestore, 'entries');
@@ -22,7 +22,6 @@ export const searchFirestore = async (searchQuery: string) => {
   return data;
 };
 
-
 export const getEntryById = async (entryId: string) => {
   const entryRef = doc(firestore, 'entries', entryId);
 
@@ -36,5 +35,27 @@ export const getEntryById = async (entryId: string) => {
     }
   } catch (error) {
     return null;
+  }
+};
+
+export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> => {
+  const entriesRef = collection(firestore, 'entries');
+  const q = query(entriesRef, orderBy('postTime', 'desc'), limit(12));
+
+  try {
+    const snapshot = await getDocs(q);
+    const latestSubmissions: EntryResultInfoCompact[] = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        courseCode: data.courseCode,
+        semester: data.semester,
+        postTime: new Date(data.postTime).getTime() || null,
+      };
+    });
+    return latestSubmissions;
+  } catch (error) {
+    console.error('Error fetching latest submissions:', error);
+    return [];
   }
 };

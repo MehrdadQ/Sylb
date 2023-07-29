@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { onAuthStateChanged } from "firebase/auth";
 import 'firebase/compat/storage';
-import { doc, getDoc } from 'firebase/firestore';
 import fileDownload from 'js-file-download';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -11,11 +10,11 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
 import LoadingIcon from "../../public/loading.svg";
-import { loadingState, userState } from '../../utilities/atoms';
-import { auth, firestore } from '../../utilities/firebase';
-import { EntryResultInfo } from '../../utilities/types'
-import { getCourseEmoji } from '../../utilities/helpers'
 import { getEntryById } from '../../utilities/api';
+import { loadingState, userState } from '../../utilities/atoms';
+import { auth } from '../../utilities/firebase';
+import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
+import { EntryResultInfo } from '../../utilities/types';
 
 
 const SearchPage = () => {
@@ -92,36 +91,6 @@ const SearchPage = () => {
     })
   }
 
-  const timeAgo = (date: Date | null | undefined): string => {
-    if (!date) {
-      return 'No submission date available';
-    }
-    const now = new Date().getTime();
-    const time = new Date(date).getTime();
-    const diff = now - time;
-  
-    const minute = 60 * 1000;
-    const hour = 60 * minute;
-    const day = 24 * hour;
-    const month = 30 * day;
-  
-    if (diff < minute) {
-      return `Submitted just now`;
-    } else if (diff < hour) {
-      const minutesAgo = Math.floor(diff / minute);
-      return `Submitted ${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
-    } else if (diff < day) {
-      const hoursAgo = Math.floor(diff / hour);
-      return `Submitted ${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`;
-    } else if (diff < month) {
-      const daysAgo = Math.floor(diff / day);
-      return `Submitted ${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
-    } else {
-      const monthsAgo = Math.floor(diff / month);
-      return `Submitted ${monthsAgo} month${monthsAgo > 1 ? 's' : ''} ago`;
-    }
-  };
-
   return (
     <>
       <Navbar />
@@ -134,7 +103,7 @@ const SearchPage = () => {
         <>
           <ResultsContainer>
             <TopSection>
-              <CourseCode>{info?.courseCode}</CourseCode>
+              <CourseCode>{info?.courseCode} {getCourseEmoji(info?.courseCode.slice(0, 3))}</CourseCode>
               <Semester>{info?.semester}</Semester>
             </TopSection>
             <BottomSection>
@@ -154,7 +123,7 @@ const SearchPage = () => {
             </Button>
             <Footer>
               <p className='link' onClick={() => goToEdit(entryID)}>Suggest changes to this submission</p>
-              <p>{timeAgo(info?.postTime)}</p>
+              <p>{timeAgo(info?.postTime!)}</p>
             </Footer>
           </ResultsContainer>
           <ToastContainer
