@@ -14,7 +14,8 @@ import LoadingIcon from "../../public/loading.svg";
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth, firestore } from '../../utilities/firebase';
 import { EntryResultInfo } from '../../utilities/types'
-
+import { getCourseEmoji } from '../../utilities/helpers'
+import { getEntryById } from '../../utilities/api';
 
 
 const SearchPage = () => {
@@ -46,29 +47,19 @@ const SearchPage = () => {
     router.push(`/suggest-edit/${id}`)
   }
 
-  const getEntryById = async (entryId: string) => {
-    const entryRef = doc(firestore, 'entries', entryId);
-  
-    try {
-      const entrySnapshot = await getDoc(entryRef);
-      if (entrySnapshot.exists()) {
-        const entryData = entrySnapshot.data();
-        return entryData;
-      } else {
-        setNotFound(true);
-        return null;
-      }
-    } catch (error) {
-      toastError("Something went wrong. Please try again.")
-      return null;
-    }
-  };
-
   const getEntryData = async () => {
     const data = await getEntryById(entryID);
-    setInfo(data as EntryResultInfo);
-    setIsLoading(false);
-    return data;
+    if (data === undefined) {
+      setNotFound(true);
+      setIsLoading(false);
+    } else if (data === null) {
+      toastError("Something went wrong. Please try again.")
+      setIsLoading(false);
+    } else {
+      setInfo(data as EntryResultInfo);
+      setIsLoading(false);
+      return data;
+    }
   };
 
   useEffect(() => {

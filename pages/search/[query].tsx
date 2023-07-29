@@ -12,6 +12,7 @@ import LoadingIcon from "../../public/loading.svg";
 import { loadingState } from '../../utilities/atoms';
 import { EntryResultInfo } from '../../utilities/types';
 import { firestore } from './../../utilities/firebase';
+import { searchFirestore } from '../../utilities/api';
 
 const SearchPage = () => {
   const router = useRouter();
@@ -25,21 +26,21 @@ const SearchPage = () => {
     setIsLoading(true);
     if (searchQuery) {
       const upperCaseSearchQuery = searchQuery.toUpperCase();
-      const searchFirestore = async () => {
-        const entriesRef = collection(firestore, 'entries');
-        const q = query(entriesRef, where('courseCode', '>=', upperCaseSearchQuery), where('courseCode', '<', upperCaseSearchQuery + '\uf8ff'));
-        
+      
+      const getData = async () => {
         try {
-          const snapshot = await getDocs(q);
-          const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as EntryResultInfo));
+          const data = await searchFirestore(upperCaseSearchQuery); 
           setResults(data);
-          setIsLoading(false)
-        } catch (error) {
+        }
+        catch {
           toastError("Oops! Something went wrong. Please try again.")
           setIsLoading(false)
         }
-      };
-      searchFirestore();
+        finally {
+          setIsLoading(false)
+        }
+      }
+      getData();
     }
   }, [searchQuery, setIsLoading]);
 
