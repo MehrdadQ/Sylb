@@ -51,6 +51,10 @@ const Home: NextPage = () => {
     window.open(`/entry/${entryID}`, '_blank');
   };
 
+  const goToAdvancedSearchPage = () => {
+    router.push(`/advanced-search`);
+  };
+
   if (user) return (
     <>
       <Navbar />
@@ -68,6 +72,11 @@ const Home: NextPage = () => {
             />
             <SearchButton type='submit' variant="outline-success">Search</SearchButton>
           </Form>
+        </Container>
+        <Container style={{paddingTop: '0'}}>
+          <AdvancedSearchButton onClick={goToAdvancedSearchPage}>
+            Do an advanced search
+          </AdvancedSearchButton>
         </Container>
         <Container>
           <h3>Most Recent Submissions</h3>
@@ -89,16 +98,16 @@ const Home: NextPage = () => {
 }
 
 const Container = styled.div`
-  padding: 1rem 4rem;
+  padding: 1rem 3rem;
   width: 70%;
 
   @media (max-width: 1200px) {
-    padding: 1rem 3rem;
+    padding: 1rem 2rem;
     width: 85%;
   }
 
   @media (max-width: 800px) {
-    padding: 1rem 2rem;
+    padding: 1rem 1rem;
     width: 100%;
   }
 
@@ -169,4 +178,50 @@ const SearchButton = styled(Button)`
   }
 `;
 
+const AdvancedSearchButton = styled.button`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #488ED8;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #ededee;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  margin: 0;
+  outline: none;
+  padding: 13px 23px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
+  user-select: none;
+  -webkit-user-select: none;
+  width: 100%;
+
+  &:focus-visible {
+    box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
+    transition: box-shadow .2s;
+  }
+
+  &:active {
+    background-color: #488ED8;
+    border-color: #000000;
+    transform: scale(.96);
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 800px) {
+    font-size: 16px;
+    width: 100%;
+  }
+`;
 export default Home;

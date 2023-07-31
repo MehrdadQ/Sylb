@@ -11,8 +11,12 @@ const CustomNavbar = () => {
   const router = useRouter();
 
   const goToAddEntryPage = () => {
-    router.push('/add-entry')
+    router.push('/add-entry');
   } 
+  
+  const goToHomePage = () => {
+    router.push('/home');
+  }
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +28,7 @@ const CustomNavbar = () => {
   return (
     <Sticky>
       <Navbar expand="sm" variant='dark'>
-        <Navbar.Brand href="#">
+        <Navbar.Brand onClick={goToHomePage} style={{cursor: "pointer"}}>
           <Image
             src="../../logo.svg"
             width="50"
@@ -40,7 +44,7 @@ const CustomNavbar = () => {
             <Form className="d-flex" onSubmit={handleSearch}>
                 <Form.Control
                   type="search"
-                  placeholder="Search"
+                  placeholder="Enter course code..."
                   className="me-2"
                   aria-label="Search"
                   value={searchQuery}

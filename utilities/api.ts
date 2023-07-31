@@ -1,5 +1,5 @@
 
-import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy, Query } from 'firebase/firestore';
 import { firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact } from './types';
 
@@ -13,9 +13,9 @@ export const requestEntryUpdate = async (data: any) => {
   await addDoc(collectionRef, data);
 }
 
-export const searchFirestore = async (searchQuery: string) => {
+export const getEntriesByCourseCode = async (searchQuery: string) => {
   const entriesRef = collection(firestore, 'entries');
-  const q = query(entriesRef, where('courseCode', '>=', searchQuery), where('courseCode', '<', searchQuery + '\uf8ff'));
+  const q = query(entriesRef, where('courseCodeSearch', 'array-contains', searchQuery));
 
   const snapshot = await getDocs(q);
   const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as EntryResultInfo));
@@ -50,6 +50,30 @@ export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> 
         id: doc.id,
         courseCode: data.courseCode,
         semester: data.semester,
+        professor: data.professor,
+        postTime: new Date(data.postTime).getTime() || null,
+      };
+    });
+    return latestSubmissions;
+  } catch (error) {
+    console.error('Error fetching latest submissions:', error);
+    return [];
+  }
+};
+
+export const getAdvancedSearchResults = async (q: Query): Promise<EntryResultInfoCompact[]> => {
+  // const entriesRef = collection(firestore, 'entries');
+  // const q = query(entriesRef, orderBy('postTime', 'desc'), limit(12));
+
+  try {
+    const snapshot = await getDocs(q);
+    const latestSubmissions: EntryResultInfoCompact[] = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        courseCode: data.courseCode,
+        semester: data.semester,
+        professor: data.professor,
         postTime: new Date(data.postTime).getTime() || null,
       };
     });

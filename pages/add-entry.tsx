@@ -142,6 +142,16 @@ const AddEntryPage: React.FC = () => {
     return obj;
   }
 
+  const generateSubstrings = (str: string) => {
+    const substrings: string[] = [];
+    for (let i = 0; i < str.length; i++) {
+      for (let j = i + 1; j <= str.length; j++) {
+        substrings.push(str.slice(i, j));
+      }
+    }
+    return Array.from(new Set(substrings));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
@@ -153,7 +163,14 @@ const AddEntryPage: React.FC = () => {
       }
       
       const updatedCourseData: EntryInfo =
-        replaceUndefinedWithEmptyString({ ...courseData, postTime: new Date().getTime(), syllabusLink: downloadURL });
+        replaceUndefinedWithEmptyString(
+          { ...courseData,
+            postTime: new Date().getTime(),
+            syllabusLink: downloadURL,
+            courseCodeSearch: generateSubstrings(courseData.courseCode!)
+          }
+        );
+
       await addCourseEntry(updatedCourseData);
     }
 

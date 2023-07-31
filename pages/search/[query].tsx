@@ -1,5 +1,4 @@
 import 'firebase/compat/storage';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -7,12 +6,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
-import ResultItem from '../../components/ResultItem';
+import SearchResultItem from '../../components/SearchResultItem';
 import LoadingIcon from "../../public/loading.svg";
+import { getEntriesByCourseCode } from '../../utilities/api';
 import { loadingState } from '../../utilities/atoms';
 import { EntryResultInfo } from '../../utilities/types';
-import { firestore } from './../../utilities/firebase';
-import { searchFirestore } from '../../utilities/api';
 
 const SearchPage = () => {
   const router = useRouter();
@@ -29,7 +27,7 @@ const SearchPage = () => {
       
       const getData = async () => {
         try {
-          const data = await searchFirestore(upperCaseSearchQuery); 
+          const data = await getEntriesByCourseCode(upperCaseSearchQuery); 
           setResults(data);
         }
         catch {
@@ -68,7 +66,7 @@ const SearchPage = () => {
             {results.length == 0 ? 
             <NoResultsMessage>Unfortunately, there were no results for {searchQuery.toUpperCase()} 😢</NoResultsMessage> :
             <>
-            <ResultItem
+            <SearchResultItem
               key={"header"}
               entryID={'header'.toUpperCase()}
               courseCode={"Course Code".toUpperCase()}
@@ -77,7 +75,7 @@ const SearchPage = () => {
               backgroundColor={'#0f2649'}
             />
             {results.map((result, index) => (
-              <ResultItem
+              <SearchResultItem
                 key={result.id}
                 entryID={result.id}
                 courseCode={result.courseCode}

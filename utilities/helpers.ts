@@ -78,6 +78,7 @@ const courseEmojis = {
   STA: "📈",
   DRM: "🎭",
   WGS: "👩",
+  AST: "🌟",
 };
 
 export const getCourseEmoji = (code: string | undefined) => {

@@ -1,15 +1,8 @@
 import router from 'next/router';
 import styled from 'styled-components';
+import { SearchResultItemProps } from '../utilities/types';
 
-type ResultItemProps = {
-  courseCode: string,
-  professor: string,
-  semester: string,
-  backgroundColor?: string
-  entryID: string
-}
-
-const ResultItem = ({ courseCode, professor, semester, backgroundColor, entryID }: ResultItemProps) => {
+const SearchResultItem = ({ courseCode, professor, semester, backgroundColor, entryID }: SearchResultItemProps) => {
   const goToInfoPage = (entryID: string) => {
     router.push(`/entry/${entryID}`);
   }
@@ -66,4 +59,4 @@ const Info = styled.div`
   }
 `;
 
-export default ResultItem;
+export default SearchResultItem;
