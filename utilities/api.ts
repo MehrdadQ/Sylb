@@ -15,7 +15,7 @@ export const requestEntryUpdate = async (data: any) => {
 
 export const getEntriesByCourseCode = async (searchQuery: string) => {
   const entriesRef = collection(firestore, 'entries');
-  const q = query(entriesRef, where('courseCodeSearch', 'array-contains', searchQuery));
+  const q = query(entriesRef, where(`courseCodeSearch.${searchQuery}`, '==', true));
 
   const snapshot = await getDocs(q);
   const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as EntryResultInfo));

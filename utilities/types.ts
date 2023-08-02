@@ -4,7 +4,7 @@ export type EntryInfo = {
   semester: string | undefined;
   autofail: 'Yes' | 'No' | 'No Final Exam' | undefined;
   courseAverage: 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'In progress' | undefined;
-  courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Asynchronous' | 'In-person with Recorded Lectures' | undefined;
+  courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Synchronous (Recorded)'| 'Online Asynchronous' | 'In-person with Recorded Lectures' | undefined;
   tutorials: 'Mandatory' | 'Optional but recommended' | 'Optional' | 'No Tutorials' | undefined;
   hasEssay: 'Yes' | 'No' | undefined;
   syllabusLink: string | undefined;
@@ -12,7 +12,7 @@ export type EntryInfo = {
   courseWebsite: string | undefined;
   postTime: Date | number | undefined;
   otherNotes: string | undefined;
-  multipleChoice: 'All questions' | 'None' | 'Some but not all' | undefined;
+  multipleChoice: 'All questions' | 'None' | 'Some questions' | undefined;
   campus: 'UTSG' | 'UTSC' | 'UTM' | undefined;
 };
 
@@ -103,6 +103,7 @@ export const courseDeliveryOptions = [
   { label: "In-person", value: "In-person" },
   { label: "In-person with Recorded Lectures", value: "In-person with Recorded Lectures" },
   { label: "Online Synchronous", value: "Online Synchronous" },
+  { label: "Online Synchronous (Recorded)", value: "Online Synchronous (Recorded)" },
   { label: "Online Asynchronous", value: "Online Asynchronous" },
 ];
 
@@ -115,8 +116,8 @@ export const tutorialOptions = [
 
 export const multipleChoiceOptions = [
   { label: "All questions", value: "All questions" },
+  { label: "Some questions", value: "Some questions" },
   { label: "None", value: "None" },
-  { label: "Some but not all", value: "Some but not all" },
 ];
 
 export const semesterDropdownOptions = [
@@ -160,4 +161,10 @@ export const autofailOptions = [
 export const booleanOptions = [
   { label: "Yes", value: "Yes" },
   { label: "No", value: "No"},
+];
+
+export const campusOptions = [
+  { label: "UTSG", value: "UTSG" },
+  { label: "UTSC", value: "UTSC"},
+  { label: "UTM", value: "UTM"},
 ];

@@ -1,62 +1,38 @@
 import router from 'next/router';
 import styled from 'styled-components';
-import { SearchResultItemProps } from '../utilities/types';
+import { EntryResultInfoCompact, SearchResultItemProps } from '../utilities/types';
+import { getCourseEmoji, timeAgo } from '../utilities/helpers';
 
-const SearchResultItem = ({ courseCode, professor, semester, backgroundColor, entryID }: SearchResultItemProps) => {
+const SearchResultItem = ({ entry }: { entry: EntryResultInfoCompact }) => {
   const goToInfoPage = (entryID: string) => {
-    router.push(`/entry/${entryID}`);
+    window.open(`/entry/${entryID}`);
   }
 
   return (
-    <Container
-      style={{
-        backgroundColor: entryID === "HEADER" ? "#0A121E" : backgroundColor,
-        fontWeight: entryID === "HEADER" ? 700 : 200,
-        cursor: entryID === "HEADER" ? 'auto' : 'pointer'
-      }}
-      onClick={entryID === "HEADER" ? () => null : () => goToInfoPage(entryID)}
-    >
-      <CourseCode>{courseCode}</CourseCode>
-      <Info>{professor}</Info>
-      <Info>{semester}</Info>
-    </Container>
+    <ResultItem onClick={() => goToInfoPage(entry.id)}>
+      <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+        <h5>{getCourseEmoji(entry.courseCode.slice(0,3))} {entry.courseCode}</h5>
+        <h6>{entry.campus}</h6>
+      </div>
+      <h6>{entry.semester}</h6>
+      <h6>{entry.professor}</h6>
+      <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
+    </ResultItem>
   )
 }
 
-const Container = styled.div`
+const ResultItem = styled.div`
+  background-color: #0A121E;
   color: #ededee;
-  display: flex;
-  text-align: center;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  border-radius: 10px;
   padding: 1rem;
-  border: 1px solid gray;
-  position: relative;
-  width: 100%;
   cursor: pointer;
-  background-color: #0f2649;
-  border: none;
-  @media (max-width: 700px) {
-    font-size: 14px;
-  }
 `;
 
-const CourseCode = styled.div`
-  width: 40%;
-  @media (max-width: 700px) {
-    width: 33%;
-    padding: 0;
-  }
-`;
-
-const Info = styled.div`
-  width: 20%;
-  padding: 0 1rem;
-  @media (max-width: 700px) {
-    width: 33%;
-    padding: 0
-  }
+const TimeAgo = styled.p`
+  float: right;
+  margin-bottom: 0px;
+  font-size: 13px;
 `;
 
 export default SearchResultItem;

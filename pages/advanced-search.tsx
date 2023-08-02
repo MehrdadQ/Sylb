@@ -16,7 +16,8 @@ import { getAdvancedSearchResults, getNumEntries } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from "../utilities/firebase";
 import { getCourseEmoji, timeAgo } from "../utilities/helpers";
-import { EntryResultInfoCompact, autofailOptions, booleanOptions, courseAverageOptions, courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions } from "../utilities/types";
+import { EntryResultInfoCompact, autofailOptions, booleanOptions, campusOptions, courseAverageOptions, courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions } from "../utilities/types";
+import SearchResultItem from "../components/SearchResultItem";
 
 // For react-multi-select-component MultiSelect 
 interface Option {
@@ -32,6 +33,7 @@ const AdvancedSearch: NextPage = () => {
   const [courseCode, setCourseCode] = useState<string>('');
   const [professor, setProfessor] = useState<string>('');
   const [semester, setSemester] = useState<Option[]>([]);
+  const [campus, setCampus] = useState<Option[]>([]);
   const [courseAverage, setCourseAverage] = useState<Option[]>([]);
   const [courseDelivery, setCourseDelivery] = useState<Option[]>([]);
   const [multipleChoice, setMultipleChoice] = useState<Option[]>([]);
@@ -85,6 +87,7 @@ const AdvancedSearch: NextPage = () => {
     setCourseCode('');
     setProfessor('');
     setSemester([]);
+    setCampus([]);
     setCourseAverage([]);
     setCourseDelivery([]);
     setMultipleChoice([]);
@@ -97,7 +100,6 @@ const AdvancedSearch: NextPage = () => {
   const queryBuilder = (pageSize: number, lastVisibleDoc: DocumentSnapshot<DocumentData> | null) => {
     const queryConstraints = [];
 
-    // USE OBJ ON FIREBASE INSTEAAD OF LIST
     if (courseCode) {
       queryConstraints.push(where(`courseCodeSearch.${courseCode}`, '==', true));
     }
@@ -108,6 +110,10 @@ const AdvancedSearch: NextPage = () => {
 
     if (semester.length > 0) {
       queryConstraints.push(where('semester', 'in', semester.map((item) => item.value)));
+    }
+
+    if (campus.length > 0) {
+      queryConstraints.push(where('campus', 'in', campus.map((item) => item.value)));
     }
 
     if (courseAverage.length > 0) {
@@ -205,7 +211,7 @@ const AdvancedSearch: NextPage = () => {
             <StyledFormLabel>Course Code</StyledFormLabel>
             <Form.Control
               type="search"
-              placeholder="Search for courses by course codes"
+              placeholder="Search by course code"
               aria-label="Search"
               value={courseCode}
               onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
@@ -227,6 +233,16 @@ const AdvancedSearch: NextPage = () => {
               options={semesterDropdownOptions}
               value={semester}
               onChange={setSemester}
+              labelledBy="Select"
+              disableSearch
+            />
+          </SelectGroup>
+          <SelectGroup>
+            <StyledFormLabel>Campus</StyledFormLabel>
+            <MultiSelect
+              options={campusOptions}
+              value={campus}
+              onChange={setCampus}
               labelledBy="Select"
               disableSearch
             />
@@ -320,15 +336,7 @@ const AdvancedSearch: NextPage = () => {
           <ResultContainer>
             {searchResults.map((entry, index) => {
               return (
-                <ResultItem key={index} onClick={() => goToInfoPage(entry.id)}>
-                  <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                    <h5>{getCourseEmoji(entry.courseCode.slice(0,3))} {entry.courseCode}</h5>
-                    <h6>{entry.campus}</h6>
-                  </div>
-                  <h6>{entry.semester}</h6>
-                  <h6>{entry.professor}</h6>
-                  <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
-                </ResultItem>
+                <SearchResultItem entry={entry} key={index} />
               )
             })}
           </ResultContainer>
@@ -371,20 +379,6 @@ const ResultContainer = styled.div`
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
-`;
-
-const ResultItem = styled.div`
-  background-color: #0A121E;
-  color: #ededee;
-  border-radius: 10px;
-  padding: 1rem;
-  cursor: pointer;
-`;
-
-const TimeAgo = styled.p`
-  float: right;
-  margin-bottom: 0px;
-  font-size: 13px;
 `;
 
 const SelectGroup = styled.div`
@@ -438,13 +432,20 @@ const LoadingImage = styled(Image)`
 
 const FormContainer = styled(Form)`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-gap: 1rem;
   margin-bottom: 2rem;
   width: 70%;
 
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   @media (max-width: 800px) {
-    grid-template-columns: 1fr;
     width: 90%;
   }
 `;

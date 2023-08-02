@@ -160,6 +160,7 @@ const EntryInfo = styled.p`
   display: inline-flex;
   font-size: 20px;
   align-items: center;
+  flex-wrap: wrap;
 
   a {
     color: #00aeff;

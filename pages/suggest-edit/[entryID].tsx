@@ -34,6 +34,7 @@ const SuggestEditPage: React.FC = () => {
     postTime: undefined,
     otherNotes: undefined,
     multipleChoice: undefined,
+    campus: undefined,
   });
   const [oldInfo, setOldInfo] = useState<EntryInfo | null>(null);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -241,6 +242,7 @@ const SuggestEditPage: React.FC = () => {
                 <option value="In-person">In-person</option>
                 <option value="In-person with Recorded Lectures">In-person with Recorded Lectures</option>
                 <option value="Online Synchronous">Online Synchronous</option>
+                <option value="Online Synchronous (Recorded)">Online Synchronous (Recorded)</option>
                 <option value="Online Asynchronous">Online Asynchronous</option>
               </Form.Select>
             </SingleColumnFormGroup>
@@ -283,6 +285,7 @@ const SuggestEditPage: React.FC = () => {
                 <option value="undefined">Select</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
+                <option value="No Final Exam">No Final Exam</option>
               </Form.Select>
             </SingleColumnFormGroup>
 
@@ -336,7 +339,7 @@ const SuggestEditPage: React.FC = () => {
                 >
                   <option value="undefined">Select</option>
                   <option value="All questions">All questions</option>
-                  <option value="Some but not all">Some but not all</option>
+                  <option value="Some questions">Some questions</option>
                   <option value="None">None</option>
                 </Form.Select>
               </InputGroup>

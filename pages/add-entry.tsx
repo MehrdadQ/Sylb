@@ -37,6 +37,7 @@ const AddEntryPage: React.FC = () => {
     campus: undefined,
   });
   const [duplicateID, setDuplicateID] = useState<string|null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
   const [user, setUser] = useRecoilState(userState);
@@ -58,6 +59,20 @@ const AddEntryPage: React.FC = () => {
     });
   }, [setUser])
   
+  useEffect(() => {
+    // Check if the user has visited before
+    if (!hasVisitedBefore()) {
+      // If not, show the modal
+      setShowModal(true);
+      // Set the 'visited' flag in localStorage to indicate that the user has visited
+      localStorage.setItem('visited', 'true');
+    }
+  }, []);
+
+  const hasVisitedBefore = () => {
+    return localStorage.getItem('visited') === 'true';
+  }
+
   const goToEntry = (entryID: string | null) => {
     if (entryID) {
       window.open(`/entry/${entryID}`, '_blank');
@@ -388,6 +403,7 @@ const AddEntryPage: React.FC = () => {
                   <option value="In-person">In-person</option>
                   <option value="In-person with Recorded Lectures">In-person with Recorded Lectures</option>
                   <option value="Online Synchronous">Online Synchronous</option>
+                  <option value="Online Synchronous (Recorded)">Online Synchronous (Recorded)</option>
                   <option value="Online Asynchronous">Online Asynchronous</option>
                 </Form.Select>
               </Form.Group>
@@ -469,7 +485,7 @@ const AddEntryPage: React.FC = () => {
                   >
                     <option value="undefined">Select</option>
                     <option value="All questions">All questions</option>
-                    <option value="Some but not all">Some but not all</option>
+                    <option value="Some questions">Some questions</option>
                     <option value="None">None</option>
                   </Form.Select>
                 </InputGroup>
@@ -582,9 +598,29 @@ const AddEntryPage: React.FC = () => {
           <NavLink onClick={() => goToEdit(duplicateID)}>HERE.</NavLink>
         </Modal.Body>
       </Modal>
+      <MessageModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+      >
+        <Modal.Header closeButton className='styled'>
+          <Modal.Title>Hey there! 👋 </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className='styled'>
+          Your contributions are much appreciated! Please make sure the info you enter is accurate and helpful for fellow
+          students considering taking this course. Happy sharing! 😊🎉
+        </Modal.Body>
+      </MessageModal>
     </>
   );
 };
+
+const MessageModal = styled(Modal)`
+  .styled {
+    background-color: #2D3748;
+    color: #ededee;
+  }
+`;
 
 const FormContainer = styled(Form)`
   padding: 2rem;

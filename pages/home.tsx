@@ -11,6 +11,7 @@ import { userState } from '../utilities/atoms';
 import { auth } from "../utilities/firebase";
 import { getCourseEmoji, timeAgo } from "../utilities/helpers";
 import { EntryResultInfoCompact } from "../utilities/types";
+import SearchResultItem from "../components/SearchResultItem";
 
 const Home: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,11 +84,7 @@ const Home: NextPage = () => {
           <ResultContainer>
             {latestSubmissions.map((entry, index) => {
               return (
-                <LatestResultItem key={index} onClick={() => goToInfoPage(entry.id)}>
-                  <h5>{getCourseEmoji(entry.courseCode.slice(0,3))} {entry.courseCode}</h5>
-                  <h6>{entry.semester}</h6>
-                  <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
-                </LatestResultItem>
+                <SearchResultItem entry={entry} key={index} />
               )
             })}
           </ResultContainer>
@@ -129,19 +126,6 @@ const ResultContainer = styled.div`
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
-`;
-
-const LatestResultItem = styled.div`
-  background-color: #0A121E;
-  color: #ededee;
-  border-radius: 10px;
-  padding: 1rem;
-  cursor: pointer;
-`;
-
-const TimeAgo = styled.p`
-  float: right;
-  margin-bottom: 0px;
 `;
 
 const MainContainer = styled.div`
