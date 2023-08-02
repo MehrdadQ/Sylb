@@ -1,5 +1,5 @@
 
-import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy, Query } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy, Query, DocumentData, DocumentSnapshot, getCountFromServer } from 'firebase/firestore';
 import { firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact } from './types';
 
@@ -51,6 +51,7 @@ export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> 
         courseCode: data.courseCode,
         semester: data.semester,
         professor: data.professor,
+        campus: data.campus,
         postTime: new Date(data.postTime).getTime() || null,
       };
     });
@@ -61,10 +62,10 @@ export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> 
   }
 };
 
-export const getAdvancedSearchResults = async (q: Query): Promise<EntryResultInfoCompact[]> => {
-  // const entriesRef = collection(firestore, 'entries');
-  // const q = query(entriesRef, orderBy('postTime', 'desc'), limit(12));
-
+export const getAdvancedSearchResults = async (q: Query): Promise<{
+  results: EntryResultInfoCompact[];
+  lastVisibleDoc: DocumentSnapshot<DocumentData> | null;
+}> => {
   try {
     const snapshot = await getDocs(q);
     const latestSubmissions: EntryResultInfoCompact[] = snapshot.docs.map((doc) => {
@@ -74,12 +75,22 @@ export const getAdvancedSearchResults = async (q: Query): Promise<EntryResultInf
         courseCode: data.courseCode,
         semester: data.semester,
         professor: data.professor,
+        campus: data.campus,
         postTime: new Date(data.postTime).getTime() || null,
       };
     });
-    return latestSubmissions;
+
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+
+    return { results: latestSubmissions, lastVisibleDoc: lastDoc };
   } catch (error) {
     console.error('Error fetching latest submissions:', error);
-    return [];
+    return { results: [], lastVisibleDoc: null };
   }
 };
+
+export const getNumEntries = async (): Promise<number>  => {
+  const collectionRef = collection(firestore, 'entries');
+  const num = await getCountFromServer(collectionRef);
+  return num.data().count;
+}

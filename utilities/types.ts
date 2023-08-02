@@ -2,7 +2,7 @@ export type EntryInfo = {
   courseCode: string | undefined;
   professor: string | undefined;
   semester: string | undefined;
-  autofail: 'Yes' | 'No' | undefined;
+  autofail: 'Yes' | 'No' | 'No Final Exam' | undefined;
   courseAverage: 'D-' | 'D' | 'D+' | 'C-' | 'C' | 'C+' | 'B-' | 'B' | 'B+' | 'A-' | 'A' | 'A+' | 'In progress' | undefined;
   courseDelivery: 'In-person' | 'Online Synchronous' | 'Online Asynchronous' | 'In-person with Recorded Lectures' | undefined;
   tutorials: 'Mandatory' | 'Optional but recommended' | 'Optional' | 'No Tutorials' | undefined;
@@ -13,6 +13,7 @@ export type EntryInfo = {
   postTime: Date | number | undefined;
   otherNotes: string | undefined;
   multipleChoice: 'All questions' | 'None' | 'Some but not all' | undefined;
+  campus: 'UTSG' | 'UTSC' | 'UTM' | undefined;
 };
 
 export type EntryResultInfo = {
@@ -31,6 +32,7 @@ export type EntryResultInfo = {
   postTime: Date | number | null;
   otherNotes: string;
   multipleChoice: string;
+  campus: string;
 }
 
 export type EntryResultInfoCompact = {
@@ -39,6 +41,7 @@ export type EntryResultInfoCompact = {
   semester: string;
   professor: string;
   postTime: Date | number | null;
+  campus: string;
 }
 
 export type SearchResultItemProps = {
@@ -147,6 +150,12 @@ export const semesterDropdownOptions = [
   { label: "Winter 2015", value: "Winter 2015" },
   { label: "Older", value: "Older" },
 ];
+
+export const autofailOptions = [
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No"},
+  { label: "No Final Exam", value: "No Final Exam"},
+]
 
 export const booleanOptions = [
   { label: "Yes", value: "Yes" },

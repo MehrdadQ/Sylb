@@ -34,6 +34,7 @@ const AddEntryPage: React.FC = () => {
     postTime: undefined,
     otherNotes: '',
     multipleChoice: undefined,
+    campus: undefined,
   });
   const [duplicateID, setDuplicateID] = useState<string|null>(null);
 
@@ -70,9 +71,9 @@ const AddEntryPage: React.FC = () => {
 
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
-      const { courseCode, semester, professor, courseAverage } = courseData;
+      const { courseCode, semester, professor, campus } = courseData;
       return courseCode !== '' && semester !== undefined && professor !== '' && 
-        courseAverage !== null;
+        campus !== undefined;
     }
     if (currentPage === 2) {
       return file !== undefined && file !== null;
@@ -125,6 +126,7 @@ const AddEntryPage: React.FC = () => {
       postTime: undefined,
       otherNotes: '',
       multipleChoice: undefined,
+      campus: undefined,
     });
     setFile(undefined);
     setCurrentPage(1);
@@ -143,14 +145,28 @@ const AddEntryPage: React.FC = () => {
   }
 
   const generateSubstrings = (str: string) => {
-    const substrings: string[] = [];
+    const substrings: { [key: string]: boolean } = {};
     for (let i = 0; i < str.length; i++) {
       for (let j = i + 1; j <= str.length; j++) {
-        substrings.push(str.slice(i, j));
+        const substring = str.slice(i, j);
+        substrings[substring] = true;
       }
     }
-    return Array.from(new Set(substrings));
-  }
+    return substrings;
+  };  
+
+  const generateSubstringsProfessorName = (str: string) => {
+    const substrings: string[] = [];
+    for (let i = 0; i < str.length; i++) {
+      for (let j = i + 1; j <= str.length; j++) { 
+        const substring = str.slice(i, j);
+        if (!substring.includes(' ') && (!i || str[i - 1] === ' ')) {
+          substrings.push(substring);
+        }
+      } 
+    }
+    return Array.from(new Set(substrings)); 
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     setIsLoading(true);
@@ -167,7 +183,8 @@ const AddEntryPage: React.FC = () => {
           { ...courseData,
             postTime: new Date().getTime(),
             syllabusLink: downloadURL,
-            courseCodeSearch: generateSubstrings(courseData.courseCode!)
+            courseCodeSearch: generateSubstrings(courseData.courseCode!),
+            professorSearch: generateSubstringsProfessorName(courseData.professor!)
           }
         );
 
@@ -308,6 +325,24 @@ const AddEntryPage: React.FC = () => {
                   onChange={(e) => setCourseData({ ...courseData, professor: e.target.value })}
                 />
               </Form.Group>
+
+              <Form.Group controlId="campus">
+                <StyledFormLabel>Campus *</StyledFormLabel>
+                <Form.Select
+                  size='sm'
+                  value={courseData.campus}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const parsedValue = value === "undefined" ? undefined : value;
+                    setCourseData({ ...courseData, campus: parsedValue as EntryInfo['campus']});
+                  }}
+                >
+                  <option value="undefined">Select campus</option>
+                  <option value="UTSG">UTSG</option>
+                  <option value="UTSC">UTSC</option>
+                  <option value="UTM">UTM</option>
+                </Form.Select>
+              </Form.Group>
               
               <Form.Group controlId="courseAverage">
                 <StyledFormLabel>Course Average</StyledFormLabel>
@@ -356,25 +391,6 @@ const AddEntryPage: React.FC = () => {
                   <option value="Online Asynchronous">Online Asynchronous</option>
                 </Form.Select>
               </Form.Group>
-
-              <Form.Group controlId="tutorials">
-                <StyledFormLabel>Tutorials</StyledFormLabel>
-                <Form.Select
-                  size='sm'
-                  value={courseData.tutorials}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value;
-                    setCourseData({ ...courseData, tutorials: parsedValue as EntryInfo['tutorials']});
-                  }}
-                >
-                  <option value="undefined">Select tutorial type</option>
-                  <option value="Mandatory">Mandatory</option>
-                  <option value="Optional but recommended">Optional but recommended</option>
-                  <option value="Optional">Optional</option>
-                  <option value="No Tutorials">No Tutorials</option>
-                </Form.Select>
-              </Form.Group>
             </>
           }
 
@@ -399,6 +415,7 @@ const AddEntryPage: React.FC = () => {
                   <option value="undefined">Select</option>
                   <option value="Yes">Yes</option>
                   <option value="No">No</option>
+                  <option value="No Final Exam">No Final Exam</option>
                 </Form.Select>
               </SingleColumnFormGroup>
 
@@ -456,6 +473,25 @@ const AddEntryPage: React.FC = () => {
                     <option value="None">None</option>
                   </Form.Select>
                 </InputGroup>
+              </SingleColumnFormGroup>
+
+              <SingleColumnFormGroup controlId="tutorials">
+                <StyledFormLabel>What were the tutorial/practical/lab types?</StyledFormLabel>
+                <Form.Select
+                  size='sm'
+                  value={courseData.tutorials}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const parsedValue = value === "undefined" ? undefined : value;
+                    setCourseData({ ...courseData, tutorials: parsedValue as EntryInfo['tutorials']});
+                  }}
+                >
+                  <option value="undefined">Select</option>
+                  <option value="Mandatory">Mandatory</option>
+                  <option value="Optional but recommended">Optional but recommended</option>
+                  <option value="Optional">Optional</option>
+                  <option value="No Tutorials">No Tutorials</option>
+                </Form.Select>
               </SingleColumnFormGroup>
             </>
           }

@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, where } from "firebase/firestore";
+import { DocumentData, DocumentSnapshot, Query, collection, limit, query, startAfter, where } from "firebase/firestore";
 import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -9,13 +9,14 @@ import { MultiSelect } from "react-multi-select-component";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
+import Pagination from "../components/Pagination";
 import LoadingIcon from "../public/loading.svg";
 import TrashIcon from '../public/trash.svg';
-import { getAdvancedSearchResults } from '../utilities/api';
+import { getAdvancedSearchResults, getNumEntries } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from "../utilities/firebase";
 import { getCourseEmoji, timeAgo } from "../utilities/helpers";
-import { EntryResultInfoCompact, booleanOptions, courseAverageOptions, courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions } from "../utilities/types";
+import { EntryResultInfoCompact, autofailOptions, booleanOptions, courseAverageOptions, courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions } from "../utilities/types";
 
 // For react-multi-select-component MultiSelect 
 interface Option {
@@ -24,6 +25,8 @@ interface Option {
   key?: string;
   disabled?: boolean;
 }
+
+const pageSize = 12;
 
 const AdvancedSearch: NextPage = () => {
   const [courseCode, setCourseCode] = useState<string>('');
@@ -39,6 +42,10 @@ const AdvancedSearch: NextPage = () => {
   const [toggleFilters, setToggleFilters] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<EntryResultInfoCompact[]>([]);
   const [message, setMessage] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [lastVisibleDoc, setLastVisibleDoc] = useState<DocumentSnapshot<DocumentData> | null>(null);
+  const [cachedSearchResults, setCachedSearchResults] = useState<{ [pageNumber: number]: EntryResultInfoCompact[] }>({});
+  const [numPages, setNumPages] = useState<number>(0);
 
   const router = useRouter();
   const [user, setUser] = useRecoilState(userState);
@@ -59,6 +66,20 @@ const AdvancedSearch: NextPage = () => {
     });
   }, [setUser, router])
 
+  useEffect(() => {
+    const fetchNumEntries = async () => {
+      try {
+        const numEntries = await getNumEntries();
+        const calculatedNumPages = Math.ceil(numEntries / pageSize);
+        setNumPages(calculatedNumPages);
+      } catch (error) {
+        console.error('Error fetching number of entries:', error);
+      }
+    };
+
+    fetchNumEntries();
+  }, []);
+
   const resetFields = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCourseCode('');
@@ -73,11 +94,16 @@ const AdvancedSearch: NextPage = () => {
     setGroupProjects([]);
   }
 
-  const queryBuilder = () => {
+  const queryBuilder = (pageSize: number, lastVisibleDoc: DocumentSnapshot<DocumentData> | null) => {
     const queryConstraints = [];
 
+    // USE OBJ ON FIREBASE INSTEAAD OF LIST
     if (courseCode) {
-      queryConstraints.push(where('courseCodeSearch', 'array-contains', courseCode));
+      queryConstraints.push(where(`courseCodeSearch.${courseCode}`, '==', true));
+    }
+
+    if (professor) {
+      queryConstraints.push(where('professorSearch', 'array-contains-any', professor.split(' ')));
     }
 
     if (semester.length > 0) {
@@ -113,33 +139,54 @@ const AdvancedSearch: NextPage = () => {
     }
 
     const entriesRef = collection(firestore, 'entries');
-    const q = query(entriesRef, ...queryConstraints);
+    let q: Query<DocumentData> = query(entriesRef, ...queryConstraints, limit(pageSize));
+
+    if (lastVisibleDoc) {
+      q = query(entriesRef, ...queryConstraints, limit(pageSize), startAfter(lastVisibleDoc));
+    }
     return q;
   };
 
+  const handlePageChange = (pageNumber: number, useCache: boolean) => {
+    if (cachedSearchResults[pageNumber] && useCache) {
+      setIsLoading(true);
+      setCurrentPage(pageNumber);
+      setSearchResults(cachedSearchResults[pageNumber]);
+      setIsLoading(false);
+    } else {
+      handlePageChangeMemo(pageNumber, !useCache);
+    }
+  };
+
+  const handlePageChangeMemo = async (pageNumber: number, searchFromBeginning: boolean) => {
+    setIsLoading(true);
+    setCurrentPage(pageNumber);
+    if (searchFromBeginning) {
+      setLastVisibleDoc(null);
+    }
+    const query = queryBuilder(pageSize, searchFromBeginning ? null : lastVisibleDoc);
+    const { results, lastVisibleDoc: newLastVisibleDoc } = await getAdvancedSearchResults(query);
+    if (results.length === 0) {
+      setMessage("No results were found with your current filters 😞");
+    }
+    setSearchResults(results);
+
+    setCachedSearchResults((prevCachedResults) => ({
+      ...prevCachedResults,
+      [pageNumber]: results,
+    }));
+
+    setLastVisibleDoc(newLastVisibleDoc);
+    setIsLoading(false);
+  };
+
+
   const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
     setMessage('');
-    const queryBuilderResults = queryBuilder();
-    const advancedSearchResults = await getAdvancedSearchResults(queryBuilderResults);
-    let results = []
-
-    if (professor.trim() !== '') {
-      const filteredResults = advancedSearchResults.filter((result) => {
-        return result.professor.includes(professor);
-      });
-      results = filteredResults;
-    } else {
-      results = advancedSearchResults;
-    }
-
-    setSearchResults(results);
-    if (results.length == 0) {
-      setMessage("Your search returned no results 😢. Try something else.")
-    }
+    setCachedSearchResults([]);
+    handlePageChange(1, false);
     setToggleFilters(false);
-    setIsLoading(false);
   };
 
   const goToInfoPage = (entryID: string) => {
@@ -153,7 +200,7 @@ const AdvancedSearch: NextPage = () => {
         <FilterToggleButton className={toggleFilters ? 'button-enabled' : 'button-disabled'} onClick={() => setToggleFilters(!toggleFilters)}>
           {toggleFilters ? 'Hide' : 'Show'} Filters
         </FilterToggleButton>
-        <FormContainer onSubmit={handleSearch} className={toggleFilters ? 'enabled' : 'disabled'} style={{transition: "all 1s ease-in-out"}}>
+        <FormContainer onSubmit={handleSearch} className={toggleFilters ? 'enabled' : 'disabled'} style={{transition: "max-height 0.5s ease-in-out 0s, opacity 0.5s ease-in-out 0.2s, margin 0.5s ease-in-out"}}>
           <Form.Group>
             <StyledFormLabel>Course Code</StyledFormLabel>
             <Form.Control
@@ -227,7 +274,7 @@ const AdvancedSearch: NextPage = () => {
           <SelectGroup>
             <StyledFormLabel>Exam Autofail</StyledFormLabel>
             <MultiSelect
-              options={booleanOptions}
+              options={autofailOptions}
               value={autofail}
               onChange={setAutofail}
               labelledBy="Select"
@@ -255,31 +302,47 @@ const AdvancedSearch: NextPage = () => {
             />
           </SelectGroup>
           <ButtonGroup>
-            <Button type='submit'>Search</Button>
-            <Button onClick={(e: any) => resetFields(e)} style={{padding: '0.2rem', backgroundColor: "black", width: '10%', minWidth: '47px', marginLeft: '1rem'}}>
-              <Image src={TrashIcon} width={30} height={30} alt="trash"
-              />
+            <Button
+              type="button"
+              onClick={(e: any) => resetFields(e)}
+              style={{padding: '0.2rem', backgroundColor: "black", width: '10%', minWidth: '47px', marginRight: '1rem'}}
+            >
+              <Image src={TrashIcon} width={30} height={30} alt="trash"/>
             </Button>
+            <Button type='submit'>Search</Button>
           </ButtonGroup>
         </FormContainer>
         {
           isLoading ?
           <LoadingImage src={LoadingIcon} alt='loading'/> :
           message ?
-          <div>
-            <h4 style={{paddingTop: '1rem'}}>{message}</h4>
-          </div> :
+          <Message>{message}</Message> :
           <ResultContainer>
             {searchResults.map((entry, index) => {
               return (
                 <ResultItem key={index} onClick={() => goToInfoPage(entry.id)}>
-                  <h5>{getCourseEmoji(entry.courseCode.slice(0,3))} {entry.courseCode}</h5>
+                  <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                    <h5>{getCourseEmoji(entry.courseCode.slice(0,3))} {entry.courseCode}</h5>
+                    <h6>{entry.campus}</h6>
+                  </div>
                   <h6>{entry.semester}</h6>
+                  <h6>{entry.professor}</h6>
                   <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
                 </ResultItem>
               )
             })}
           </ResultContainer>
+        }
+        {searchResults.length > 0 &&
+          <Pagination
+            currentPage={currentPage}
+            totalPages={numPages}
+            goFirst={() => handlePageChange(1, true)}
+            goLast={() => handlePageChange(numPages, true)}
+            goBack={() => handlePageChange(currentPage - 1, true)}
+            goNext={() => handlePageChange(currentPage + 1, true)}
+            onPageClick={(pageNumber) => handlePageChange(pageNumber, true)}
+          />
         }
       </MainContainer>
     </>
@@ -321,6 +384,7 @@ const ResultItem = styled.div`
 const TimeAgo = styled.p`
   float: right;
   margin-bottom: 0px;
+  font-size: 13px;
 `;
 
 const SelectGroup = styled.div`
@@ -329,6 +393,13 @@ const SelectGroup = styled.div`
   h6 {
     color: white;
   }
+`;
+
+const Message = styled.div`
+  padding-top: 1rem;
+  width: 90%;
+  text-align: center;
+  font-size: 20px;
 `;
 
 const MainContainer = styled.div`
@@ -369,7 +440,6 @@ const FormContainer = styled(Form)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 1rem;
-  margin-top: 1rem;
   margin-bottom: 2rem;
   width: 70%;
 
