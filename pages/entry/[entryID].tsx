@@ -5,12 +5,15 @@ import fileDownload from 'js-file-download';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { Form, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
+import EditIcon from "../../public/edit.svg";
 import LoadingIcon from "../../public/loading.svg";
-import { getEntryById } from '../../utilities/api';
+import ReportIcon from "../../public/report.svg";
+import { getEntryById, requestEntryUpdate } from '../../utilities/api';
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth } from '../../utilities/firebase';
 import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
@@ -21,6 +24,8 @@ const SearchPage = () => {
   const router = useRouter();
   const [info, setInfo] = useState<EntryResultInfo | null>(null);
   const [notFound, setNotFound] = useState<boolean>(false);
+  const [reportMessage, setReportMessage] = useState<string>("");
+  const [showReportModal, setShowReportModal] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
 
@@ -42,8 +47,39 @@ const SearchPage = () => {
     });
   }, [setUser, router])
 
+  useEffect(() => {
+    setIsLoading(true);
+    if (entryID) {
+      getEntryData();
+    }
+  }, [entryID]);
+
+  const reportEntry = async () => {
+    setIsLoading(true);
+    await requestEntryUpdate({
+      entryID: entryID,
+      otherNotes: `REPORT: ${reportMessage}`
+    });
+    setIsLoading(false);
+    setShowReportModal(false);
+    toastSuccess("Thank you for reporting this submission! We will review this entry ASAP!")
+  }
+
   const goToEdit = (id: string) => {
     router.push(`/suggest-edit/${id}`)
+  }
+
+  const toastSuccess = (message: string) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
   }
 
   const getEntryData = async () => {
@@ -60,14 +96,6 @@ const SearchPage = () => {
       return data;
     }
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-    if (entryID) {
-      getEntryData();
-    }
-  }, [entryID]);
-  
 
   const toastError = (errorMessage: string) => {
     toast.error(errorMessage, {
@@ -94,7 +122,7 @@ const SearchPage = () => {
   return (
     <>
       <Navbar />
-      {isLoading || !entryID ?
+      {(isLoading && !showReportModal) || !entryID ?
         <LoadingImage src={LoadingIcon} alt='loading'/> : notFound ?
         <NotFound>
           <p>Oops! This link seems to be broken.</p>
@@ -122,10 +150,48 @@ const SearchPage = () => {
               Download Syllabus 📜
             </Button>
             <Footer>
-              <p className='link' onClick={() => goToEdit(entryID)}>Suggest changes to this submission</p>
+              <div style={{display: "inline-flex"}}>
+                <LinkButton onClick={() => goToEdit(entryID)}>
+                  <Image src={EditIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                  <p style={{color: '#7bb2ec'}}>Suggest edits</p>
+
+                </LinkButton>
+                <LinkButton style={{marginLeft: '1rem'}} onClick={() => setShowReportModal(true)}>
+                  <Image src={ReportIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                  <p style={{color: '#e95353'}}>
+                    Report
+                  </p>
+                </LinkButton>
+              </div>
               <p>{timeAgo(info?.postTime!)}</p>
             </Footer>
           </ResultsContainer>
+          <MessageModal show={showReportModal} onHide={() => setShowReportModal(false)} centered>
+            <Modal.Header closeButton className='styled'>
+              <Modal.Title>Report submission</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className='styled'>
+              <Form>
+                <Form.Group controlId='reportMessage'>
+                  <Form.Label>Report Message:</Form.Label>
+                  <Form.Control
+                    type='text'
+                    placeholder='Enter your report message...'
+                    value={reportMessage}
+                    onChange={(e) => setReportMessage(e.target.value)}
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer className='styled' style={{display: "flex", justifyContent: "center"}}>
+              <Button onClick={reportEntry} style={{width: "200px", fontSize: "14px"}}>
+                {isLoading ?
+                  <Image src={LoadingIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                : <>Submit Report</>
+                }
+              </Button>
+            </Modal.Footer>
+          </MessageModal>
           <ToastContainer
             position="top-right"
             autoClose={5000}
@@ -297,7 +363,6 @@ const Footer = styled.div`
   .link {
     padding-top: 0.5rem;
     color: #7bb2ec;
-    text-decoration: underline;
     cursor: pointer;
   }
 
@@ -312,6 +377,25 @@ const Footer = styled.div`
       padding-top: 1rem;
       margin-bottom: 0.5rem;
     }
+  }
+`;
+
+const MessageModal = styled(Modal)`
+  .styled {
+    background-color: #2D3748;
+    color: #ededee;
+  }
+`;
+
+const LinkButton = styled.div`
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+
+  p {
+    margin: 0;
+    margin-left: 5px;
+    padding: 0;
   }
 `;
 

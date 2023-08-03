@@ -107,7 +107,7 @@ const SuggestEditPage: React.FC = () => {
     });
   }
 
-  function replaceUndefinedWithEmptyString<T>(obj: T): T {
+  function filterUnchangedFields<T>(obj: T): T {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const value = obj[key as keyof T];
@@ -134,10 +134,10 @@ const SuggestEditPage: React.FC = () => {
           throw new Error();
         }
         updatedCourseData =
-          replaceUndefinedWithEmptyString({ ...info, postTime: new Date().getTime(), syllabusLink: downloadURL, entryID: entryID });
+          filterUnchangedFields({ ...info, postTime: new Date().getTime(), syllabusLink: downloadURL, entryID: entryID });
       } else {
         updatedCourseData =
-          replaceUndefinedWithEmptyString({ ...info, postTime: new Date().getTime(), entryID: entryID });
+          filterUnchangedFields({ ...info, postTime: new Date().getTime(), entryID: entryID });
       }
         
       await requestEntryUpdate(updatedCourseData);
@@ -197,19 +197,20 @@ const SuggestEditPage: React.FC = () => {
         </SuccessMsg> :
         <MainContainer>
           <ExistingDataContainer onSubmit={handleSubmit}>
-            <h3>Suggesting Changes for <span>{info.courseCode}</span> with <span>{info.professor}</span> during <span>{info.semester}</span></h3>
-              <SingleColumnFormGroup controlId="courseAverage">
+            <SingleColumnFormGroup>
+              <h3>Suggesting Edits for <span>{info.courseCode}</span> with <span>{info.professor}</span> during <span>{info.semester}</span></h3>
+            </SingleColumnFormGroup>
+              <Form.Group controlId="courseAverage">
                 <StyledFormLabel>Course Average <span>{info.courseAverage !== oldInfo?.courseAverage && '(UPDATED)'}</span></StyledFormLabel>
                 <Form.Select
                   size='sm'
                   value={info?.courseAverage}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value === "null" ? null : value;
-                    setInfo({ ...info, courseAverage: parsedValue as EntryInfo['courseAverage'] });
+                    setInfo({ ...info, courseAverage: value as EntryInfo['courseAverage'] });
                   }}    
                 >
-                  <option value="null">What was the course average?</option>
+                  <option value="">What was the course average?</option>
                   <option value="A+">A+</option>
                   <option value="A">A</option>
                   <option value="A-">A-</option>
@@ -223,129 +224,123 @@ const SuggestEditPage: React.FC = () => {
                   <option value="D">D</option>
                   <option value="D-">D-</option>
                   <option value="In progress">In progress</option>
-                  <option value="undefined">Not sure...</option>
+                  <option value="">Not sure...</option>
                 </Form.Select>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="courseDelivery">
+            <Form.Group controlId="courseDelivery">
               <StyledFormLabel>Course Delivery <span>{info.courseDelivery !== oldInfo?.courseDelivery && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Select
                 size='sm'
                 value={info?.courseDelivery}
                 onChange={(e) => {
                   const value = e.target.value;
-                  const parsedValue = value === "undefined" ? undefined : value;
-                  setInfo({ ...info, courseDelivery: parsedValue as EntryInfo['courseDelivery']});
+                  setInfo({ ...info, courseDelivery: value as EntryInfo['courseDelivery']});
                 }}    
               >
-                <option value="undefined">What was the course delivery type?</option>
+                <option value="">What was the course delivery type?</option>
                 <option value="In-person">In-person</option>
                 <option value="In-person with Recorded Lectures">In-person with Recorded Lectures</option>
                 <option value="Online Synchronous">Online Synchronous</option>
                 <option value="Online Synchronous (Recorded)">Online Synchronous (Recorded)</option>
                 <option value="Online Asynchronous">Online Asynchronous</option>
               </Form.Select>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="tutorials">
+            <Form.Group controlId="tutorials">
               <StyledFormLabel>Tutorials <span>{info.tutorials !== oldInfo?.tutorials && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Select
                 size='sm'
                 value={info?.tutorials}
                 onChange={(e) => {
                   const value = e.target.value;
-                  const parsedValue = value === "undefined" ? undefined : value;
-                  setInfo({ ...info, tutorials: parsedValue as EntryInfo['tutorials']});
+                  setInfo({ ...info, tutorials: value as EntryInfo['tutorials']});
                 }}
               >
-                <option value="undefined">Select tutorial type</option>
+                <option value="">Select tutorial type</option>
                 <option value="Mandatory">Mandatory</option>
                 <option value="Optional but recommended">Optional but recommended</option>
                 <option value="Optional">Optional</option>
                 <option value="No Tutorials">No Tutorials</option>
               </Form.Select>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup  controlId="syllabusFile">
+            <Form.Group  controlId="syllabusFile">
               <StyledFormLabel>New Syllabus File <span>{file !== undefined && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf,.docx" />
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="autofail">
+            <Form.Group controlId="autofail">
               <StyledFormLabel>Autofail <span>{info.autofail !== oldInfo?.autofail && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Select
                 size='sm'
-                value={info?.autofail ? info?.autofail.toString() : undefined}
+                value={info?.autofail}
                 onChange={(e) => {
                   const value = e.target.value;
-                  const parsedValue = value === "undefined" ? undefined : value;
-                  setInfo({ ...info, autofail: parsedValue as EntryInfo["autofail"] });
+                  setInfo({ ...info, autofail: value as EntryInfo["autofail"] });
                 }}
               >
-                <option value="undefined">Select</option>
+                <option value="">Select</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
                 <option value="No Final Exam">No Final Exam</option>
               </Form.Select>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="hasEssay">
+            <Form.Group controlId="hasEssay">
               <StyledFormLabel>Essays <span>{info.hasEssay !== oldInfo?.hasEssay && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Select
                 size='sm'
-                value={info?.hasEssay ? info?.hasEssay.toString() : undefined}
+                value={info?.hasEssay}
                 onChange={(e) => {
                   const value = e.target.value;
-                  const parsedValue = value === "undefined" ? undefined : value
-                  setInfo({ ...info, hasEssay: parsedValue as EntryInfo["hasEssay"] });
+                  setInfo({ ...info, hasEssay: value as EntryInfo["hasEssay"] });
                 }}
               >
-                <option value="undefined">Select</option>
+                <option value="">Select</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </Form.Select>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="groupProjects">
+            <Form.Group controlId="groupProjects">
               <StyledFormLabel>Group Projects <span>{info.groupProjects !== oldInfo?.groupProjects && '(UPDATED)'}</span></StyledFormLabel>
               <InputGroup>
                 <Form.Select
                   size='sm'
-                  value={info?.groupProjects ? info?.groupProjects.toString() : undefined}
+                  value={info?.groupProjects}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value;
-                    setInfo({ ...info, groupProjects: parsedValue as EntryInfo["groupProjects"]  });
+                    setInfo({ ...info, groupProjects: value as EntryInfo["groupProjects"]  });
                   }}
                 >
-                  <option value="undefined">Select</option>
+                  <option value="">Select</option>
                   <option value="Yes">Yes</option>
                   <option value="No">No</option>
                 </Form.Select>
               </InputGroup>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="groupProjects">
+            <Form.Group controlId="groupProjects">
               <StyledFormLabel>Multiple Choice <span>{info.multipleChoice !== oldInfo?.multipleChoice && '(UPDATED)'}</span></StyledFormLabel>
               <InputGroup>
                 <Form.Select
                   size='sm'
-                  value={info?.multipleChoice ? info?.multipleChoice.toString() : undefined}
+                  value={info?.multipleChoice}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const parsedValue = value === "undefined" ? undefined : value;
-                    setInfo({ ...info, multipleChoice: parsedValue as EntryInfo['multipleChoice']});
+                    setInfo({ ...info, multipleChoice: value as EntryInfo['multipleChoice']});
                   }}
                 >
-                  <option value="undefined">Select</option>
+                  <option value="">Select</option>
                   <option value="All questions">All questions</option>
                   <option value="Some questions">Some questions</option>
                   <option value="None">None</option>
                 </Form.Select>
               </InputGroup>
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="courseWebsite">
+            <Form.Group controlId="courseWebsite">
               <StyledFormLabel>Course Website <span>{info.courseWebsite !== oldInfo?.courseWebsite && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Control
                 placeholder='Enter course website if there is one'
@@ -355,9 +350,9 @@ const SuggestEditPage: React.FC = () => {
                 value={info?.courseWebsite}
                 onChange={(e) => setInfo({ ...info, courseWebsite: e.target.value })}
               />
-            </SingleColumnFormGroup>
+            </Form.Group>
 
-            <SingleColumnFormGroup controlId="otherNotes">
+            <Form.Group controlId="otherNotes">
               <StyledFormLabel>Other Notes <span>{info.otherNotes !== oldInfo?.otherNotes && '(UPDATED)'}</span></StyledFormLabel>
               <Form.Control
                 placeholder='Anything else others should know?'
@@ -367,7 +362,7 @@ const SuggestEditPage: React.FC = () => {
                 value={info?.otherNotes}
                 onChange={(e) => setInfo({ ...info, otherNotes: e.target.value })}
               />
-            </SingleColumnFormGroup>
+            </Form.Group>
             <Button>Submit</Button>
           </ExistingDataContainer>
         </MainContainer>
@@ -381,16 +376,27 @@ const ExistingDataContainer = styled(Form)`
   padding: 1rem 4rem;
   display: grid;
   grid-gap: 1rem;
-  width: 50%;
-
+  grid-template-columns: repeat(3, 1fr);
+  width: 70%;
+  
   @media (max-width: 1200px) {
     padding: 1rem 3rem;
+    grid-template-columns: repeat(3, 1fr);
     width: 80%;
   }
 
+  @media (max-width: 1000px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
   @media (max-width: 800px) {
-    padding: 1rem 2rem;
+    padding: 0.5rem 1rem;
     width: 100%;
+    padding-bottom: 2rem;
+  }
+
+  @media (max-width: 450px) {
+    grid-template-columns: repeat(1, 1fr);
   }
   
   h3 {
@@ -406,7 +412,7 @@ const MainContainer = styled.div`
   color: #EDEDEE;
   position: relative;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
