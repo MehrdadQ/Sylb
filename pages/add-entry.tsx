@@ -14,7 +14,7 @@ import LoadingIcon from "../public/loading.svg";
 import { addCourseEntry } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from '../utilities/firebase';
-import { EntryInfo, semesterOptions } from "../utilities/types";
+import { EntryInfo, courseAverageSorting, semesterOptions, semesterSorting } from "../utilities/types";
 
 const AddEntryPage: React.FC = () => {
   const [file, setFile] = useState<File | undefined | null>(undefined);
@@ -199,7 +199,9 @@ const AddEntryPage: React.FC = () => {
             postTime: new Date().getTime(),
             syllabusLink: downloadURL,
             courseCodeSearch: generateSubstrings(courseData.courseCode!),
-            professorSearch: generateSubstringsProfessorName(courseData.professor!)
+            professorSearch: generateSubstringsProfessorName(courseData.professor!),
+            semesterNumValue: semesterSorting[courseData.semester as keyof typeof semesterSorting],
+            courseAverageNumValue: courseAverageSorting[courseData.courseAverage as keyof typeof courseAverageSorting]
           }
         );
 

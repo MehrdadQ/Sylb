@@ -6,12 +6,11 @@ import { Button, Form } from "react-bootstrap";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
+import SearchResultItem from "../components/SearchResultItem";
 import { getLatestSubmissions } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from "../utilities/firebase";
-import { getCourseEmoji, timeAgo } from "../utilities/helpers";
 import { EntryResultInfoCompact } from "../utilities/types";
-import SearchResultItem from "../components/SearchResultItem";
 
 const Home: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState('');

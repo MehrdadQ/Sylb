@@ -105,6 +105,10 @@ const TopContainer = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  h3 {
+    margin: 0;
+  }
+
   @media (max-width: 700px) {
     flex-wrap: wrap-reverse;
     button {
@@ -145,7 +149,7 @@ const ResultContainer = styled.div`
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (max-width: 600px) {
+  @media (max-width: 500px) {
     grid-template-columns: 1fr;
   }
 `;
@@ -204,7 +208,7 @@ const Button = styled.button`
     opacity: 0.9;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 500px) {
     padding: 6px 9px;
     width: 100%;
     margin-bottom: 1rem;

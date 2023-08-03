@@ -6,18 +6,22 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import { MultiSelect } from "react-multi-select-component";
+import { ToastContainer, toast } from 'react-toastify';
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import Pagination from "../components/Pagination";
+import SearchResultItem from "../components/SearchResultItem";
 import LoadingIcon from "../public/loading.svg";
 import TrashIcon from '../public/trash.svg';
 import { getAdvancedSearchResults, getNumEntries } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from "../utilities/firebase";
-import { getCourseEmoji, timeAgo } from "../utilities/helpers";
-import { EntryResultInfoCompact, autofailOptions, booleanOptions, campusOptions, courseAverageOptions, courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions } from "../utilities/types";
-import SearchResultItem from "../components/SearchResultItem";
+import {
+  EntryResultInfoCompact, autofailOptions, booleanOptions, campusOptions, courseAverageOptions,
+  courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions
+} from "../utilities/types";
+
 
 // For react-multi-select-component MultiSelect 
 interface Option {
@@ -41,6 +45,7 @@ const AdvancedSearch: NextPage = () => {
   const [autofail, setAutofail] = useState<Option[]>([]);
   const [hasEssay, setHasEssay] = useState<Option[]>([]);
   const [groupProjects, setGroupProjects] = useState<Option[]>([]);
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const [toggleFilters, setToggleFilters] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<EntryResultInfoCompact[]>([]);
   const [message, setMessage] = useState<string>('');
@@ -101,46 +106,46 @@ const AdvancedSearch: NextPage = () => {
     const queryConstraints = [];
 
     if (courseCode) {
-      queryConstraints.push(where(`courseCodeSearch.${courseCode}`, '==', true));
+      queryConstraints.push(where(`courseCodeSearch.${courseCode.trim()}`, '==', true));
     }
 
     if (professor) {
       queryConstraints.push(where('professorSearch', 'array-contains-any', professor.split(' ')));
     }
 
-    if (semester.length > 0) {
+    if (semester.length > 0 && semester.length !== semesterDropdownOptions.length) {
       queryConstraints.push(where('semester', 'in', semester.map((item) => item.value)));
     }
 
-    if (campus.length > 0) {
+    if (campus.length > 0 && campus.length !== campusOptions.length) {
       queryConstraints.push(where('campus', 'in', campus.map((item) => item.value)));
     }
 
-    if (courseAverage.length > 0) {
+    if (courseAverage.length > 0 && courseAverage.length !== courseAverageOptions.length) {
       queryConstraints.push(where('courseAverage', 'in', courseAverage.map((item) => item.value)));
     }
 
-    if (courseDelivery.length > 0) {
+    if (courseDelivery.length > 0 && courseDelivery.length !== courseDeliveryOptions.length) {
       queryConstraints.push(where('courseDelivery', 'in', courseDelivery.map((item) => item.value)));
     }
 
-    if (multipleChoice.length > 0) {
+    if (multipleChoice.length > 0 && multipleChoice.length !== multipleChoiceOptions.length) {
       queryConstraints.push(where('multipleChoice', 'in', multipleChoice.map((item) => item.value)));
     }
 
-    if (tutorials.length > 0) {
+    if (tutorials.length > 0 && tutorials.length !== tutorialOptions.length) {
       queryConstraints.push(where('tutorials', 'in', tutorials.map((item) => item.value)));
     }
 
-    if (autofail.length > 0) {
+    if (autofail.length > 0 && autofail.length !== autofailOptions.length) {
       queryConstraints.push(where('autofail', 'in', autofail.map((item) => item.value)));
     }
     
-    if (groupProjects.length > 0) {
+    if (groupProjects.length > 0 && groupProjects.length !== booleanOptions.length) {
       queryConstraints.push(where('groupProjects', 'in', groupProjects.map((item) => item.value)));
     }
 
-    if (hasEssay.length > 0) {
+    if (hasEssay.length > 0 && hasEssay.length !== booleanOptions.length) {
       queryConstraints.push(where('hasEssay', 'in', hasEssay.map((item) => item.value)));
     }
 
@@ -155,10 +160,8 @@ const AdvancedSearch: NextPage = () => {
 
   const handlePageChange = (pageNumber: number, useCache: boolean) => {
     if (cachedSearchResults[pageNumber] && useCache) {
-      setIsLoading(true);
       setCurrentPage(pageNumber);
       setSearchResults(cachedSearchResults[pageNumber]);
-      setIsLoading(false);
     } else {
       handlePageChangeMemo(pageNumber, !useCache);
     }
@@ -171,9 +174,9 @@ const AdvancedSearch: NextPage = () => {
       setLastVisibleDoc(null);
     }
     const query = queryBuilder(pageSize, searchFromBeginning ? null : lastVisibleDoc);
-    const { results, lastVisibleDoc: newLastVisibleDoc } = await getAdvancedSearchResults(query);
-    if (results.length === 0) {
-      setMessage("No results were found with your current filters 😞");
+    const { results, lastVisibleDoc: newLastVisibleDoc, errorMessage } = await getAdvancedSearchResults(query);
+    if (errorMessage) {
+      setMessage(errorMessage);
     }
     setSearchResults(results);
 
@@ -195,9 +198,18 @@ const AdvancedSearch: NextPage = () => {
     setToggleFilters(false);
   };
 
-  const goToInfoPage = (entryID: string) => {
-    window.open(`/entry/${entryID}`, '_blank');
-  };
+  const toastError = (errorMessage: string) => {
+    toast.error(errorMessage, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
 
   if (user) return (
     <>
@@ -224,7 +236,13 @@ const AdvancedSearch: NextPage = () => {
               placeholder="Find professors by name"
               aria-label="Search"
               value={professor}
-              onChange={(e) => setProfessor(e.target.value)}
+              onChange={(e) => {
+                const words = e.target.value.split(' ');
+                const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+                const capitalizedProfessor = capitalizedWords.join(' ');
+                setProfessor(capitalizedProfessor);
+              }}
+                         
             />
           </Form.Group>
           <SelectGroup>
@@ -235,6 +253,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setSemester}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -245,6 +264,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setCampus}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -255,6 +275,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setCourseAverage}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -265,6 +286,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setCourseDelivery}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -275,6 +297,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setTutorials}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -285,6 +308,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setMultipleChoice}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -295,6 +319,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setAutofail}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -305,6 +330,7 @@ const AdvancedSearch: NextPage = () => {
               onChange={setGroupProjects}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <SelectGroup>
@@ -353,6 +379,18 @@ const AdvancedSearch: NextPage = () => {
           />
         }
       </MainContainer>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </>
   )
 }
@@ -376,7 +414,7 @@ const ResultContainer = styled.div`
     width: 90%;
   }
   
-  @media (max-width: 600px) {
+  @media (max-width: 500px) {
     grid-template-columns: 1fr;
   }
 `;
@@ -391,9 +429,12 @@ const SelectGroup = styled.div`
 
 const Message = styled.div`
   padding-top: 1rem;
-  width: 90%;
+  width: 70%;
   text-align: center;
   font-size: 20px;
+  @media (max-width: 800px) {
+    width: 90%;
+  }
 `;
 
 const MainContainer = styled.div`

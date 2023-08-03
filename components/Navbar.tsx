@@ -48,7 +48,7 @@ const CustomNavbar = () => {
                   className="me-2"
                   aria-label="Search"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                 />
                 <SearchButton type='submit' variant="outline-success">Search</SearchButton>
             </Form>

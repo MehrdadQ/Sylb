@@ -1,5 +1,6 @@
 
-import { addDoc, collection, getDocs, query, where, doc, getDoc, limit, orderBy, Query, DocumentData, DocumentSnapshot, getCountFromServer } from 'firebase/firestore';
+import { FirebaseError } from '@firebase/util';
+import { DocumentData, DocumentSnapshot, Query, addDoc, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact } from './types';
 
@@ -65,6 +66,7 @@ export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> 
 export const getAdvancedSearchResults = async (q: Query): Promise<{
   results: EntryResultInfoCompact[];
   lastVisibleDoc: DocumentSnapshot<DocumentData> | null;
+  errorMessage: string | null;
 }> => {
   try {
     const snapshot = await getDocs(q);
@@ -82,10 +84,19 @@ export const getAdvancedSearchResults = async (q: Query): Promise<{
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
 
-    return { results: latestSubmissions, lastVisibleDoc: lastDoc };
+    if (latestSubmissions.length == 0) {
+      return { results: latestSubmissions, lastVisibleDoc: lastDoc, errorMessage: "No results were found with your current filters 😞" };
+    }
+    return { results: latestSubmissions, lastVisibleDoc: lastDoc, errorMessage: null };
+    
   } catch (error) {
-    console.error('Error fetching latest submissions:', error);
-    return { results: [], lastVisibleDoc: null };
+    if (error instanceof FirebaseError) {
+      if (error.message.includes("Too many")) {
+        return { results: [], lastVisibleDoc: null, errorMessage: "Sorry, but we currently can't handle that many filter options at the same time.\
+        Please remove some and try again." };
+      }
+    }
+    return { results: [], lastVisibleDoc: null, errorMessage: "Oops, something went wrong. Maybe try a different search?" };
   }
 };
 
