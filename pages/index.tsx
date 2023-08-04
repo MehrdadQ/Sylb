@@ -8,6 +8,7 @@ import { Nav, NavItem, Navbar } from 'react-bootstrap';
 import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import ScrollDownArrow from '../components/ScrollDownArrow';
+import { getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
 
@@ -27,10 +28,12 @@ const Main: NextPage = () => {
   const [user, setUser] = useRecoilState(userState);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       }
     });
   }, [setUser])

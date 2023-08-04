@@ -14,7 +14,7 @@ import Pagination from "../components/Pagination";
 import SearchResultItem from "../components/SearchResultItem";
 import LoadingIcon from "../public/loading.svg";
 import TrashIcon from '../public/trash.svg';
-import { getAdvancedSearchResults, getNumEntries } from '../utilities/api';
+import { getAdvancedSearchResults, getNumEntries, getUserInfo } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from "../utilities/firebase";
 import {
@@ -62,10 +62,12 @@ const AdvancedSearch: NextPage = () => {
     const goToLogin = () => {
       router.push("/login")
     }
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       } else {
         goToLogin();
       }

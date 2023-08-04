@@ -1,8 +1,9 @@
 import { atom } from 'recoil'
+import { UserInfo } from './types'
 
-export const userState = atom({
+export const userState = atom<UserInfo | null>({
   key: 'userState',
-  default: ""
+  default: null
 })
 
 export const loadingState = atom({

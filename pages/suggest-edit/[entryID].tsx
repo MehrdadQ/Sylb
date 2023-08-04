@@ -11,7 +11,7 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../../components/Navbar';
 import LoadingIcon from "../../public/loading.svg";
-import { requestEntryUpdate } from '../../utilities/api';
+import { getUserInfo, requestEntryUpdate } from '../../utilities/api';
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth, firestore } from '../../utilities/firebase';
 import { EntryInfo } from "../../utilities/types";
@@ -51,10 +51,12 @@ const SuggestEditPage: React.FC = () => {
     const goToLogin = () => {
       router.push("/login")
     }
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       } else {
         goToLogin();
       }

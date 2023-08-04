@@ -7,7 +7,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import SearchResultItem from "../components/SearchResultItem";
-import { getLatestSubmissions } from "../utilities/api";
+import { getLatestSubmissions, getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from "../utilities/firebase";
 import { EntryResultInfoCompact } from "../utilities/types";
@@ -23,10 +23,12 @@ const Home: NextPage = () => {
     const goToLogin = () => {
       router.push("/login")
     }
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       } else {
         goToLogin();
       }

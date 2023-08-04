@@ -8,6 +8,7 @@ import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import EmailSvg from "../public/email.svg";
 import GoogleSvg from "../public/google.svg";
+import { getUserInfo } from '../utilities/api';
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
 
@@ -26,10 +27,12 @@ const LoginPage: NextPage = () => {
     const goToHome = () => {
       router.push("/home")
     }
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
         goToHome();
       }
     });
@@ -59,10 +62,12 @@ const LoginPage: NextPage = () => {
   }
 
   const setLoggedInUser = () => {
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       }
     });
   }

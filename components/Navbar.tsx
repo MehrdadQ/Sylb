@@ -4,16 +4,15 @@ import { FormEvent, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Navbar from 'react-bootstrap/Navbar';
-import styled from 'styled-components';
-import { auth } from '../utilities/firebase';
 import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
 import { userState } from '../utilities/atoms';
+import { auth } from '../utilities/firebase';
 
 const CustomNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useRecoilState(userState);
   const router = useRouter();
-
 
   const goToAddEntryPage = () => {
     router.push('/add-entry');
@@ -27,7 +26,7 @@ const CustomNavbar = () => {
     try {
       await auth.signOut();
       goToLandingPage();
-      setUser("");
+      setUser(null);
     } catch (error) {
       console.error('Error logging out:', error);
     }

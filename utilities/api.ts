@@ -14,6 +14,20 @@ export const addUserToCollection = async (uid: string) => {
   await addDoc(collectionRef, userData);
 };
 
+export const getUserInfo = async (uid: string): Promise<UserInfo | null> => {
+  const usersRef = collection(firestore, 'users');
+  const q = query(usersRef, where('uid', '==', uid));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  const userInfo: UserInfo = { uid, ...doc.data() } as UserInfo;
+  return userInfo;
+};
+
 export const addCourseEntry = async (data: EntryInfo) => {
   const collectionRef = collection(firestore, 'entries');
   await addDoc(collectionRef, data);

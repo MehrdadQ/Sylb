@@ -13,7 +13,7 @@ import Navbar from '../../components/Navbar';
 import EditIcon from "../../public/edit.svg";
 import LoadingIcon from "../../public/loading.svg";
 import ReportIcon from "../../public/report.svg";
-import { getEntryById, requestEntryUpdate } from '../../utilities/api';
+import { getEntryById, getUserInfo, requestEntryUpdate } from '../../utilities/api';
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth } from '../../utilities/firebase';
 import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
@@ -37,10 +37,12 @@ const SearchPage = () => {
     const goToLogin = () => {
       router.push("/login")
     }
-    onAuthStateChanged(auth, (currentUser) => {
+    onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const uid = currentUser.uid;
-        setUser(uid)
+        if (!user) {
+          setUser(await getUserInfo(uid));
+        }
       } else {
         goToLogin();
       }
