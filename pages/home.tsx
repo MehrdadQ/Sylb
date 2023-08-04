@@ -83,7 +83,7 @@ const Home: NextPage = () => {
           <ResultContainer>
             {latestSubmissions.map((entry, index) => {
               return (
-                <SearchResultItem entry={entry} key={index} />
+                <SearchResultItem entry={entry} key={index} openInNewTab={false}/>
               )
             })}
           </ResultContainer>

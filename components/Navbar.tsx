@@ -5,18 +5,38 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Navbar from 'react-bootstrap/Navbar';
 import styled from 'styled-components';
+import { auth } from '../utilities/firebase';
+import { useRecoilState } from 'recoil';
+import { userState } from '../utilities/atoms';
 
 const CustomNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useRecoilState(userState);
   const router = useRouter();
+
 
   const goToAddEntryPage = () => {
     router.push('/add-entry');
-  } 
+  };
+
+  const goToLandingPage = () => {
+    router.push('/');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      goToLandingPage();
+      setUser("");
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+  
   
   const goToHomePage = () => {
     router.push('/home');
-  }
+  };
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,6 +60,7 @@ const CustomNavbar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <FormContainer>
+            <NavButton onClick={handleLogout}>Log out</NavButton>
             <NavButton onClick={goToAddEntryPage}>Add your syllabus</NavButton>
             <Form className="d-flex" onSubmit={handleSearch}>
                 <Form.Control

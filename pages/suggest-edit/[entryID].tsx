@@ -183,6 +183,10 @@ const SuggestEditPage: React.FC = () => {
     }
   };
 
+  const canSubmit = () => {
+    return JSON.stringify(info) !== JSON.stringify(oldInfo);
+  };
+
   return (
     <>
       <Navbar />
@@ -363,7 +367,7 @@ const SuggestEditPage: React.FC = () => {
                 onChange={(e) => setInfo({ ...info, otherNotes: e.target.value })}
               />
             </Form.Group>
-            <Button>Submit</Button>
+            <Button disabled={!canSubmit()}>Submit</Button>
           </ExistingDataContainer>
         </MainContainer>
       }

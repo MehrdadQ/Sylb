@@ -1,10 +1,17 @@
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { getCourseEmoji, timeAgo } from '../utilities/helpers';
 import { EntryResultInfoCompact } from '../utilities/types';
 
-const SearchResultItem = ({ entry }: { entry: EntryResultInfoCompact }) => {
+const SearchResultItem = ({ entry, openInNewTab }: { entry: EntryResultInfoCompact, openInNewTab: boolean }) => {
+  const router = useRouter();
+
   const goToInfoPage = (entryID: string) => {
-    window.open(`/entry/${entryID}`);
+    if (openInNewTab) {
+      window.open(`/entry/${entryID}`);
+    } else {
+      router.push(`/entry/${entryID}`);
+    }
   }
 
   return (

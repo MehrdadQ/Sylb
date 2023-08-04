@@ -45,7 +45,6 @@ const AdvancedSearch: NextPage = () => {
   const [autofail, setAutofail] = useState<Option[]>([]);
   const [hasEssay, setHasEssay] = useState<Option[]>([]);
   const [groupProjects, setGroupProjects] = useState<Option[]>([]);
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const [toggleFilters, setToggleFilters] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<EntryResultInfoCompact[]>([]);
   const [message, setMessage] = useState<string>('');
@@ -362,7 +361,7 @@ const AdvancedSearch: NextPage = () => {
           <ResultContainer>
             {searchResults.map((entry, index) => {
               return (
-                <SearchResultItem entry={entry} key={index} />
+                <SearchResultItem entry={entry} key={index} openInNewTab={true}/>
               )
             })}
           </ResultContainer>

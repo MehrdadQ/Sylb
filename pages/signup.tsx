@@ -1,4 +1,4 @@
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
 import Image from 'next/image';
@@ -8,6 +8,7 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import EmailSvg from "../public/email.svg";
 import GoogleSvg from "../public/google.svg";
+import { addUserToCollection } from '../utilities/api';
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
 
@@ -25,6 +26,19 @@ const SignUpPage: NextPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const goToHome = () => {
+      router.push("/home")
+    }
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const uid = currentUser.uid;
+        setUser(uid)
+        goToHome();
+      }
+    });
+  }, [])
+
+  useEffect(() => {
     const newErrors = [];
     if (password.length < 7) {
       newErrors.push("Password must be at least 7 characters long");
@@ -35,14 +49,18 @@ const SignUpPage: NextPage = () => {
     setErrors(newErrors);
   }, [password, passwordConfirm]);
 
-  const setLoggedInUser = () => {
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        const uid = currentUser.uid;
-        setUser(uid)
-      }
-    });
-  }
+
+  const setLoggedInUser = async () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+  
+    if (currentUser) {
+      const uid = currentUser.uid;
+      setUser(uid);
+      await addUserToCollection(uid);
+      goToHome();
+    }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
     if (event.key === 'Enter') {
@@ -63,8 +81,7 @@ const SignUpPage: NextPage = () => {
     e.preventDefault();
     try {
       await auth.createUserWithEmailAndPassword(email, password);
-      setLoggedInUser();
-      goToHome();
+      await setLoggedInUser();
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         setErrors(["The email address you provided is already in use. Please try a different email address."]);
@@ -85,7 +102,6 @@ const SignUpPage: NextPage = () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       await auth.signInWithPopup(provider);
       setLoggedInUser();
-      goToHome();
     } catch (error) {
       console.error('Error signing up with Google:', error);
     }

@@ -14,9 +14,7 @@ import { auth } from '../utilities/firebase';
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
-  Where do we find the syllabus? What has the course average been for each professor? \
-  Does this course require an essay? Is there an autofail on the exam? \
-  Are there group projects? What does the grading scheme look like? \
+  Where do we find the syllabus? What was the course average been last semester? \
   Are tutorials mandatory? Are the lectures recorded?",
   "Introducing Sylb! All your questions answered. Sign up for free and unlock the power of \
   knowledge-sharing. 📚💡",
@@ -85,7 +83,7 @@ const Main: NextPage = () => {
         </Navbar> 
       </Sticky>
       <FullHeightDiv>
-        <Slide>
+        <Slide className="slide" style={{marginTop: '-100px'}}>
           <Section id="intro">
             <TextSection>
               <MainTitle>Welcome to <span>Sylb.io</span>,</MainTitle>
@@ -113,9 +111,9 @@ const Main: NextPage = () => {
           <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="shape-fill"></path>
         </svg>
       </SvgContainer>
-      <FullHeightDiv style={{backgroundColor: "#0A121E", paddingTop: "50px"}}>
-        <Slide direction='right'>
-          <Section id="learn-more">
+      <FullHeightDiv style={{backgroundColor: "#0A121E !important", paddingTop: "50px"}} id="learn-more">
+        <Slide direction='right' className="slide" >
+          <Section>
             <ImgContainer>
               <Image src="/../public/landingPage2.png" alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
@@ -167,10 +165,20 @@ const ButtonGroup = styled.div`
 `
 
 const FullHeightDiv = styled.div`
-  min-height: calc(100vh - 60px);
-  background-color: #2D3748;
   overflow-x: hidden;
-  color: #EDEDEE;
+  .slide {
+    min-height: calc(100vh - 60px);
+    overflow-x: hidden;
+    color: #EDEDEE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (max-width: 1000px) {
+      margin-top: 0 !important;
+    }
+    
+  }
 `;
 
 const CallToActionBtn = styled.button`
@@ -221,19 +229,23 @@ const CallToActionBtn = styled.button`
   @media (max-width: 1200px) {
     font-size: 14px;
   }
-`
+`;
 
 const Section = styled.div`
-  padding: 10rem 10rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   overflow: hidden;
+  width: 65%;
 
-  @media (max-width: 1350px) {
-    padding: 8rem 1rem;
+  @media (max-width: 1600px) {
+    width: 80%;
+  }
+  @media (max-width: 1300px) {
+    /* padding: 8rem 1rem; */
     justify-content: center;
+    width: 90%;
   }
 `;
 
@@ -247,12 +259,18 @@ const MainTitle = styled.h2`
   @media (max-width: 1200px) {
     font-size: 36px;
   }
+  @media (max-width: 600px) {
+    font-size: 28px;
+  }
 `
 
 const Title = styled.h2`
   font-size: 42px;
   @media (max-width: 1200px) {
     font-size: 28px;
+  }
+  @media (max-width: 600px) {
+    font-size: 22px;
   }
 `
 
@@ -261,6 +279,9 @@ const MainText = styled.p`
   @media (max-width: 1200px) {
     font-size: 22px;
   }
+  @media (max-width: 600px) {
+    font-size: 18px;
+  }
 `
 
 const Text = styled.p`
@@ -268,12 +289,19 @@ const Text = styled.p`
   @media (max-width: 1200px) {
     font-size: 18px;
   }
+  @media (max-width: 600px) {
+    font-size: 16px;
+  }
 `
 
 const TextSection = styled.div`
   width: 50%;
   @media (max-width: 1000px) {
     width: 80%;
+    margin: 2rem 0;
+  }
+  @media (max-width: 600px) {
+    width: 95%;
     margin: 2rem 0;
   }
 `

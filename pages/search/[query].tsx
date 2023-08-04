@@ -74,7 +74,7 @@ const SearchPage = () => {
             <NoResultsMessage>Unfortunately, there were no results for {searchQuery.toUpperCase()} 😢</NoResultsMessage> :
             <ResultContainer>
               {results.map((result, index) => (
-                <SearchResultItem entry={result} key={index}/>
+                <SearchResultItem entry={result} key={index} openInNewTab={false}/>
               ))}
             </ResultContainer>
             }

@@ -2,7 +2,17 @@
 import { FirebaseError } from '@firebase/util';
 import { DocumentData, DocumentSnapshot, Query, addDoc, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { firestore } from './firebase';
-import { EntryInfo, EntryResultInfo, EntryResultInfoCompact } from './types';
+import { EntryInfo, EntryResultInfo, EntryResultInfoCompact, UserInfo } from './types';
+
+export const addUserToCollection = async (uid: string) => {
+  const userData: UserInfo = {
+    uid: uid,
+    credits: 10,
+    votedFor: [],
+  };
+  const collectionRef = collection(firestore, 'users');
+  await addDoc(collectionRef, userData);
+};
 
 export const addCourseEntry = async (data: EntryInfo) => {
   const collectionRef = collection(firestore, 'entries');
@@ -12,7 +22,7 @@ export const addCourseEntry = async (data: EntryInfo) => {
 export const requestEntryUpdate = async (data: any) => {
   const collectionRef = collection(firestore, 'updateRequests');
   await addDoc(collectionRef, data);
-}
+};
 
 export const getEntriesByCourseCode = async (searchQuery: string) => {
   const entriesRef = collection(firestore, 'entries');
@@ -104,4 +114,4 @@ export const getNumEntries = async (): Promise<number>  => {
   const collectionRef = collection(firestore, 'entries');
   const num = await getCountFromServer(collectionRef);
   return num.data().count;
-}
+};

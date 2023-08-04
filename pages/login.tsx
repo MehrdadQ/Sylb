@@ -22,6 +22,18 @@ const LoginPage: NextPage = () => {
   const spanRef = useRef<HTMLSpanElement>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    const goToHome = () => {
+      router.push("/home")
+    }
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const uid = currentUser.uid;
+        setUser(uid)
+        goToHome();
+      }
+    });
+  }, [setUser, router])
 
   useEffect(() => {
     setErrors([]);
@@ -135,7 +147,7 @@ const LoginPage: NextPage = () => {
             </ForgotPasswordMessage>
             {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
             <ButtonGroup>
-              <Button onClick={() => setIsEmail(false)}>Back to login options</Button>
+              <Button onClick={() => {setIsEmail(false); setErrors([])}}>Back to login options</Button>
               <Button
                 type="submit"
                 style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}

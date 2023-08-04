@@ -33,7 +33,7 @@ export type EntryResultInfo = {
   otherNotes: string;
   multipleChoice: string;
   campus: string;
-}
+};
 
 export type EntryResultInfoCompact = {
   id: string;
@@ -42,14 +42,12 @@ export type EntryResultInfoCompact = {
   professor: string;
   postTime: Date | number | null;
   campus: string;
-}
+};
 
-export type SearchResultItemProps = {
-  courseCode: string,
-  professor: string,
-  semester: string,
-  backgroundColor?: string
-  entryID: string
+export type UserInfo = {
+  uid: string,
+  credits: number,
+  votedFor: string[],
 };
 
 export const semesterOptions = [
@@ -160,7 +158,7 @@ export const autofailOptions = [
   { label: "Yes", value: "Yes" },
   { label: "No", value: "No"},
   { label: "No Final Exam", value: "No Final Exam"},
-]
+];
 
 export const booleanOptions = [
   { label: "Yes", value: "Yes" },
