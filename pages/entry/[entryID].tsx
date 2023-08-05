@@ -13,7 +13,7 @@ import Navbar from '../../components/Navbar';
 import EditIcon from "../../public/edit.svg";
 import LoadingIcon from "../../public/loading.svg";
 import ReportIcon from "../../public/report.svg";
-import { getEntryById, getUserInfo, requestEntryUpdate } from '../../utilities/api';
+import { addToUserAccessList, getEntryById, getUserInfo, requestEntryUpdate, updateUserCredits } from '../../utilities/api';
 import { loadingState, userState } from '../../utilities/atoms';
 import { auth } from '../../utilities/firebase';
 import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
@@ -26,6 +26,7 @@ const SearchPage = () => {
   const [notFound, setNotFound] = useState<boolean>(false);
   const [reportMessage, setReportMessage] = useState<string>("");
   const [showReportModal, setShowReportModal] = useState<boolean>(false);
+  const [showDownloadConfirmModal, setShowDownloadConfirmModal] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
 
@@ -69,7 +70,15 @@ const SearchPage = () => {
 
   const goToEdit = (id: string) => {
     router.push(`/suggest-edit/${id}`)
-  }
+  };
+  
+  const goToAddEntry = () => {
+    router.push("/add-entry")
+  };
+  
+  const goToSettings = () => {
+    router.push("/settings")
+  };
 
   const toastSuccess = (message: string) => {
     toast.success(message, {
@@ -82,7 +91,7 @@ const SearchPage = () => {
       progress: undefined,
       theme: "dark",
     });
-  }
+  };
 
   const getEntryData = async () => {
     const data = await getEntryById(entryID);
@@ -121,6 +130,30 @@ const SearchPage = () => {
     })
   }
 
+  const userHasAccess = () => {
+    return user?.hasAccessTo?.includes(entryID) || false;
+  };
+
+  const handleDownloadClick = () => {
+    if (userHasAccess()) {
+      handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`);
+    } else {
+      setShowDownloadConfirmModal(true);
+    }
+  }
+
+  const spendCreditsAndDownload = async () => {
+    await updateUserCredits(user?.uid!, user?.credits! - 1);
+    await addToUserAccessList(user?.uid!, entryID);
+    setUser((prevUser) => ({
+      ...prevUser!,
+      credits: prevUser!.credits - 1,
+      hasAccessTo: [...(prevUser!.hasAccessTo ?? []), entryID],
+    }));
+    handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`);
+    setShowDownloadConfirmModal(false);
+  }
+
   return (
     <>
       <Navbar />
@@ -131,43 +164,45 @@ const SearchPage = () => {
           <p>It&apos;s possible the submission was deleted or is no longer available. Feel free to try a search instead.</p>
         </NotFound> :
         <>
-          <ResultsContainer>
-            <TopSection>
-              <CourseCode>{info?.courseCode} {getCourseEmoji(info?.courseCode.slice(0, 3))}</CourseCode>
-              <Semester>{info?.semester}</Semester>
-            </TopSection>
-            <BottomSection>
-              <EntryInfo><Bold>👨‍🏫 Professor:</Bold> {info?.professor}</EntryInfo>
-              {info?.courseAverage !== "" && <EntryInfo><Bold>🎯 Course Average:</Bold> {info?.courseAverage}</EntryInfo>}
-              {info?.courseDelivery !== "" && <EntryInfo><Bold>📅 Course Delivery:</Bold> {info?.courseDelivery}</EntryInfo>}
-              {info?.tutorials !== "" && <EntryInfo><Bold>📚 Tutorials:</Bold> {info?.tutorials}</EntryInfo>}
-              {info?.groupProjects !== "" && <EntryInfo><Bold>👥 Group Projects:</Bold> {info?.groupProjects}</EntryInfo>}
-              {info?.hasEssay !== "" && <EntryInfo><Bold>📝 Essays:</Bold> {info?.hasEssay}</EntryInfo>}
-              {info?.autofail !== "" && <EntryInfo><Bold>⛔️ Exam Autofail:</Bold> {info?.autofail}</EntryInfo>}
-              {info?.multipleChoice !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
-              {info?.courseWebsite !== "" && <EntryInfo><Bold>🌐 Course Website:</Bold> <a href={info?.courseWebsite} target='_blank'>Link to website</a></EntryInfo>}
-              {info?.otherNotes !== "" && <EntryInfo><Bold>📌 Other Notes:</Bold> {info?.otherNotes}</EntryInfo>}
-            </BottomSection>
-            <Button onClick={() => handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`)}>
-              Download Syllabus 📜
-            </Button>
-            <Footer>
-              <div style={{display: "inline-flex"}}>
-                <LinkButton onClick={() => goToEdit(entryID)}>
-                  <Image src={EditIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
-                  <p style={{color: '#7bb2ec'}}>Suggest edits</p>
+          <Centered>
+            <ResultsContainer>
+              <TopSection>
+                <CourseCode>{info?.courseCode} {getCourseEmoji(info?.courseCode.slice(0, 3))}</CourseCode>
+                <Semester>{info?.semester}</Semester>
+              </TopSection>
+              <BottomSection>
+                <EntryInfo><Bold>👨‍🏫 Professor:</Bold> {info?.professor}</EntryInfo>
+                {info?.courseAverage !== "" && <EntryInfo><Bold>🎯 Course Average:</Bold> {info?.courseAverage}</EntryInfo>}
+                {info?.courseDelivery !== "" && <EntryInfo><Bold>📅 Course Delivery:</Bold> {info?.courseDelivery}</EntryInfo>}
+                {info?.tutorials !== "" && <EntryInfo><Bold>📚 Tutorials:</Bold> {info?.tutorials}</EntryInfo>}
+                {info?.groupProjects !== "" && <EntryInfo><Bold>👥 Group Projects:</Bold> {info?.groupProjects}</EntryInfo>}
+                {info?.hasEssay !== "" && <EntryInfo><Bold>📝 Essays:</Bold> {info?.hasEssay}</EntryInfo>}
+                {info?.autofail !== "" && <EntryInfo><Bold>⛔️ Exam Autofail:</Bold> {info?.autofail}</EntryInfo>}
+                {info?.multipleChoice !== "" && <EntryInfo><Bold>✅ Multiple Choice:</Bold> {info?.multipleChoice}</EntryInfo>}
+                {info?.courseWebsite !== "" && <EntryInfo><Bold>🌐 Course Website:</Bold> <a href={info?.courseWebsite} target='_blank'>Link to website</a></EntryInfo>}
+                {info?.otherNotes !== "" && <EntryInfo><Bold>📌 Other Notes:</Bold> {info?.otherNotes}</EntryInfo>}
+              </BottomSection>
+              <Button onClick={handleDownloadClick}>
+                Download Syllabus 📜
+              </Button>
+              <Footer>
+                <div style={{display: "inline-flex"}}>
+                  <LinkButton onClick={() => goToEdit(entryID)}>
+                    <Image src={EditIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                    <p style={{color: '#7bb2ec'}}>Suggest edits</p>
 
-                </LinkButton>
-                <LinkButton style={{marginLeft: '1rem'}} onClick={() => setShowReportModal(true)}>
-                  <Image src={ReportIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
-                  <p style={{color: '#e95353'}}>
-                    Report
-                  </p>
-                </LinkButton>
-              </div>
-              <p>{timeAgo(info?.postTime!)}</p>
-            </Footer>
-          </ResultsContainer>
+                  </LinkButton>
+                  <LinkButton style={{marginLeft: '1rem'}} onClick={() => setShowReportModal(true)}>
+                    <Image src={ReportIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                    <p style={{color: '#e95353'}}>
+                      Report
+                    </p>
+                  </LinkButton>
+                </div>
+                <p>{timeAgo(info?.postTime!)}</p>
+              </Footer>
+            </ResultsContainer>
+          </Centered>
           <MessageModal show={showReportModal} onHide={() => setShowReportModal(false)} centered>
             <Modal.Header closeButton className='styled'>
               <Modal.Title>Report submission</Modal.Title>
@@ -181,18 +216,45 @@ const SearchPage = () => {
                     placeholder='Enter your report message...'
                     value={reportMessage}
                     onChange={(e) => setReportMessage(e.target.value)}
+                    autoFocus
                   />
                 </Form.Group>
               </Form>
             </Modal.Body>
             <Modal.Footer className='styled' style={{display: "flex", justifyContent: "center"}}>
-              <Button onClick={reportEntry} style={{width: "200px", fontSize: "14px"}}>
+              <Button onClick={reportEntry} style={{width: "200px", fontSize: "18px"}}>
                 {isLoading ?
                   <Image src={LoadingIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
                 : <>Submit Report</>
                 }
               </Button>
             </Modal.Footer>
+          </MessageModal>
+          <MessageModal show={showDownloadConfirmModal} onHide={() => setShowDownloadConfirmModal(false)} centered>
+            <Modal.Header closeButton className='styled'>
+              <Modal.Title>{user?.credits! > 0 ? "Download Syllabus" : "No credits remaining"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className='styled'>
+              {user?.credits! > 0 ?
+                <p>
+                  One credit will be used to download this syllabus. You will have {user?.credits! - 1} remaining credits.
+                </p> :
+                <p>
+                  You have no remaining credits. Either <span onClick={goToAddEntry}>submit an entry</span> or
+                  go to <span onClick={goToSettings}>settings</span> to get more credits.
+                </p>
+              }
+            </Modal.Body>
+            {user?.credits! > 0 && 
+              <Modal.Footer className='styled' style={{display: "flex", justifyContent: "center"}}>
+                <Button onClick={spendCreditsAndDownload} style={{width: "200px", fontSize: "18px"}}>
+                  {isLoading ?
+                    <Image src={LoadingIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
+                  : <>Confirm</>
+                  }
+                </Button>
+              </Modal.Footer>
+            }
           </MessageModal>
           <ToastContainer
             position="top-right"
@@ -218,6 +280,7 @@ const TopSection = styled.div`
   justify-content: space-between;
   border-bottom: 1px solid white;
   padding-bottom: 1rem;
+  width: 100%;
 `;
 
 const CourseCode = styled.h2`
@@ -255,6 +318,7 @@ const BottomSection = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 1rem;
+  width: 100%;
   padding-top: 1rem;
   @media (max-width: 800px) {
     grid-template-columns: 1fr;
@@ -263,15 +327,26 @@ const BottomSection = styled.div`
 `;
 
 const ResultsContainer = styled.div`
-  margin: 1rem 30rem;
-  @media (max-width: 1700px) {
-    margin: 1rem 20rem;
-  }
+  width: 70%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+
   @media (max-width: 1400px) {
-    margin: 1rem 6rem;
+    width: 80%;
   }
   @media (max-width: 700px) {
-    margin: 1rem;
+    width: 95%;
+  }
+`;
+
+const Centered = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  @media (max-width: 700px) {
+    margin-top: 1rem;
   }
 `;
 
@@ -357,6 +432,7 @@ const Footer = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
+  width: 100%;
 
   p {
     padding-top: 0.5rem;
@@ -384,8 +460,15 @@ const Footer = styled.div`
 
 const MessageModal = styled(Modal)`
   .styled {
+    border: none;
+    outline: none;
     background-color: #2D3748;
     color: #ededee;
+
+    span {
+      cursor: pointer;
+      color: #488ED8;
+    }
   }
 `;
 

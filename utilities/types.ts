@@ -47,7 +47,7 @@ export type EntryResultInfoCompact = {
 export type UserInfo = {
   uid: string,
   credits: number,
-  votedFor: string[],
+  hasAccessTo: string[],
 };
 
 export const semesterOptions = [

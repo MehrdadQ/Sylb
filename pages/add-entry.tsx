@@ -11,7 +11,7 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Navbar from '../components/Navbar';
 import LoadingIcon from "../public/loading.svg";
-import { addCourseEntry, getUserInfo } from '../utilities/api';
+import { addCourseEntry, getUserInfo, updateUserCredits } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from '../utilities/firebase';
 import { EntryInfo, courseAverageSorting, semesterOptions, semesterSorting } from "../utilities/types";
@@ -62,11 +62,8 @@ const AddEntryPage: React.FC = () => {
   }, [setUser])
   
   useEffect(() => {
-    // Check if the user has visited before
     if (!hasVisitedBefore()) {
-      // If not, show the modal
       setShowModal(true);
-      // Set the 'visited' flag in localStorage to indicate that the user has visited
       localStorage.setItem('visited', 'true');
     }
   }, []);
@@ -203,11 +200,18 @@ const AddEntryPage: React.FC = () => {
             courseCodeSearch: generateSubstrings(courseData.courseCode!),
             professorSearch: generateSubstringsProfessorName(courseData.professor!),
             semesterNumValue: semesterSorting[courseData.semester as keyof typeof semesterSorting],
-            courseAverageNumValue: courseAverageSorting[courseData.courseAverage as keyof typeof courseAverageSorting]
+            courseAverageNumValue: courseAverageSorting[courseData.courseAverage as keyof typeof courseAverageSorting],
+            submittedBy: user?.uid
           }
         );
 
-      await addCourseEntry(updatedCourseData);
+      const newEntryUid = await addCourseEntry(user?.uid!, updatedCourseData);
+      await updateUserCredits(user?.uid!, user?.credits! + 1);
+      setUser((prevUser) => ({
+        ...prevUser!,
+        credits: user?.credits! + 1,
+        hasAccessTo: [...(prevUser!.hasAccessTo ?? []), newEntryUid],
+      }));
     }
 
     catch (e: any) {
@@ -215,7 +219,7 @@ const AddEntryPage: React.FC = () => {
       setIsLoading(false);
       return;
     }
-    toastSuccess("Added successfully! 🎉")
+    toastSuccess(`Added successfully! 🎉 You now have ${user?.credits! + 1} credits!`);
     goNextPage(null);
     setIsLoading(false);
   };

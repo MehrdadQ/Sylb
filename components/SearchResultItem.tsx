@@ -2,9 +2,14 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { getCourseEmoji, timeAgo } from '../utilities/helpers';
 import { EntryResultInfoCompact } from '../utilities/types';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../utilities/atoms';
+import CheckmarkIcon from "../public/checkmark.svg";
+import Image from 'next/image';
 
 const SearchResultItem = ({ entry, openInNewTab }: { entry: EntryResultInfoCompact, openInNewTab: boolean }) => {
   const router = useRouter();
+  const user = useRecoilValue(userState);
 
   const goToInfoPage = (entryID: string) => {
     if (openInNewTab) {
@@ -24,7 +29,12 @@ const SearchResultItem = ({ entry, openInNewTab }: { entry: EntryResultInfoCompa
         <h6>📅: {entry.semester}</h6>
         <h6>👨‍🏫: {entry.professor}</h6>
       </div>
-      <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
+      <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
+        {user?.hasAccessTo.includes(entry.id) && <>
+          <Image src={CheckmarkIcon} alt='loading' style={{width: "15px", height: 'auto', marginRight: '6px', marginBottom: '-2px'}}/>
+        </>}
+        <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>
+      </div>
     </ResultItem>
   )
 }

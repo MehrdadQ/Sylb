@@ -1,6 +1,6 @@
 
 import { FirebaseError } from '@firebase/util';
-import { DocumentData, DocumentSnapshot, Query, addDoc, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
+import { DocumentData, DocumentSnapshot, Query, addDoc, arrayUnion, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact, UserInfo } from './types';
 
@@ -8,7 +8,7 @@ export const addUserToCollection = async (uid: string) => {
   const userData: UserInfo = {
     uid: uid,
     credits: 10,
-    votedFor: [],
+    hasAccessTo: [],
   };
   const collectionRef = collection(firestore, 'users');
   await addDoc(collectionRef, userData);
@@ -28,9 +28,45 @@ export const getUserInfo = async (uid: string): Promise<UserInfo | null> => {
   return userInfo;
 };
 
-export const addCourseEntry = async (data: EntryInfo) => {
+export const updateUserCredits = async (uidValue: string, newCredits: number) => {
+  const usersRef = collection(firestore, 'users');
+  const q = query(usersRef, where('uid', '==', uidValue));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    const userDocRef = querySnapshot.docs[0].ref;
+
+    try {
+      await updateDoc(userDocRef, { credits: newCredits });
+    } catch (error) {
+      console.error('Error updating credits:', error);
+    }
+  }
+};
+
+export const addToUserAccessList = async (uidValue: string, entryUid: string) => {
+  const usersRef = collection(firestore, 'users');
+  const q = query(usersRef, where('uid', '==', uidValue));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    const userDocRef = querySnapshot.docs[0].ref;
+
+    try {
+      await updateDoc(userDocRef, {
+        hasAccessTo: arrayUnion(entryUid)
+      });
+    } catch (error) {
+    }
+  }
+};
+
+export const addCourseEntry = async (userUid: string, data: EntryInfo) => {
   const collectionRef = collection(firestore, 'entries');
-  await addDoc(collectionRef, data);
+  const newDocRef = await addDoc(collectionRef, data);
+  const newEntryUid = newDocRef.id;
+  await addToUserAccessList(userUid, newEntryUid);
+  return newEntryUid;
 };
 
 export const requestEntryUpdate = async (data: any) => {
