@@ -14,7 +14,7 @@ import Pagination from "../components/Pagination";
 import SearchResultItem from "../components/SearchResultItem";
 import LoadingIcon from "../public/loading.svg";
 import TrashIcon from '../public/trash.svg';
-import { getAdvancedSearchResults, getNumEntries, getUserInfo } from '../utilities/api';
+import { getAdvancedSearchResults, getUserInfo } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth, firestore } from "../utilities/firebase";
 import {
@@ -74,20 +74,6 @@ const AdvancedSearch: NextPage = () => {
     });
   }, [setUser, router])
 
-  useEffect(() => {
-    const fetchNumEntries = async () => {
-      try {
-        const numEntries = await getNumEntries();
-        const calculatedNumPages = Math.ceil(numEntries / pageSize);
-        setNumPages(calculatedNumPages);
-      } catch (error) {
-        console.error('Error fetching number of entries:', error);
-      }
-    };
-
-    fetchNumEntries();
-  }, []);
-
   const resetFields = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCourseCode('');
@@ -103,7 +89,7 @@ const AdvancedSearch: NextPage = () => {
     setGroupProjects([]);
   }
 
-  const queryBuilder = (pageSize: number, lastVisibleDoc: DocumentSnapshot<DocumentData> | null) => {
+  const queryBuilder = () => {
     const queryConstraints = [];
 
     if (courseCode) {
@@ -150,13 +136,7 @@ const AdvancedSearch: NextPage = () => {
       queryConstraints.push(where('hasEssay', 'in', hasEssay.map((item) => item.value)));
     }
 
-    const entriesRef = collection(firestore, 'entries');
-    let q: Query<DocumentData> = query(entriesRef, ...queryConstraints, limit(pageSize));
-
-    if (lastVisibleDoc) {
-      q = query(entriesRef, ...queryConstraints, limit(pageSize), startAfter(lastVisibleDoc));
-    }
-    return q;
+    return queryConstraints;
   };
 
   const handlePageChange = (pageNumber: number, useCache: boolean) => {
@@ -174,8 +154,13 @@ const AdvancedSearch: NextPage = () => {
     if (searchFromBeginning) {
       setLastVisibleDoc(null);
     }
-    const query = queryBuilder(pageSize, searchFromBeginning ? null : lastVisibleDoc);
-    const { results, lastVisibleDoc: newLastVisibleDoc, errorMessage } = await getAdvancedSearchResults(query);
+    const query = queryBuilder();
+    const { results, lastVisibleDoc: newLastVisibleDoc, errorMessage, totalCount } = 
+      await getAdvancedSearchResults(query, pageNumber === 1, pageSize, searchFromBeginning ? null : lastVisibleDoc);
+    if (pageNumber === 1 && totalCount) {
+      const calculatedNumPages = Math.ceil(totalCount / pageSize);
+      setNumPages(calculatedNumPages);
+    }
     if (errorMessage) {
       setMessage(errorMessage);
     }

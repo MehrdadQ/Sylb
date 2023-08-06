@@ -1,6 +1,6 @@
 
 import { FirebaseError } from '@firebase/util';
-import { DocumentData, DocumentSnapshot, Query, addDoc, arrayUnion, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import { DocumentData, DocumentSnapshot, Query, QueryFieldFilterConstraint, QueryLimitConstraint, QuerySnapshot, addDoc, arrayUnion, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, updateDoc, where } from 'firebase/firestore';
 import { firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact, UserInfo } from './types';
 
@@ -123,14 +123,32 @@ export const getLatestSubmissions = async (): Promise<EntryResultInfoCompact[]> 
   }
 };
 
-export const getAdvancedSearchResults = async (q: Query): Promise<{
+export const getAdvancedSearchResults =
+  async (queryConstraints: QueryFieldFilterConstraint[], getTotalCount: boolean, pageSize: number, lastVisibleDoc: DocumentSnapshot<DocumentData> | null): Promise<{
   results: EntryResultInfoCompact[];
   lastVisibleDoc: DocumentSnapshot<DocumentData> | null;
   errorMessage: string | null;
+  totalCount?: number;
 }> => {
+  let totalCount: number | undefined = undefined;
+  const entriesRef = collection(firestore, 'entries');
+
   try {
+    if (getTotalCount) {
+      const countQuery = query(entriesRef, ...queryConstraints);
+      const snapshot = await getCountFromServer(countQuery);
+      totalCount = snapshot.data().count;
+    }
+
+    let q: Query<DocumentData>;
+    if (lastVisibleDoc) {
+      q = query(entriesRef, ...queryConstraints, limit(pageSize), startAfter(lastVisibleDoc));
+    } else {
+      q = query(entriesRef, ...queryConstraints, limit(pageSize));
+    }
+
     const snapshot = await getDocs(q);
-    const latestSubmissions: EntryResultInfoCompact[] = snapshot.docs.map((doc) => {
+    const entries: EntryResultInfoCompact[] = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -141,27 +159,21 @@ export const getAdvancedSearchResults = async (q: Query): Promise<{
         postTime: new Date(data.postTime).getTime() || null,
       };
     });
+    console.log(entries);
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
 
-    if (latestSubmissions.length == 0) {
-      return { results: latestSubmissions, lastVisibleDoc: lastDoc, errorMessage: "No results were found with your current filters 😞" };
+    if (entries.length === 0) {
+      return { results: entries, lastVisibleDoc: lastDoc, errorMessage: "No results were found with your current filters 😞", totalCount: 0 };
     }
-    return { results: latestSubmissions, lastVisibleDoc: lastDoc, errorMessage: null };
-    
+
+    return { results: entries, lastVisibleDoc: lastDoc, errorMessage: null, ...(getTotalCount && { totalCount }) };
   } catch (error) {
     if (error instanceof FirebaseError) {
       if (error.message.includes("Too many")) {
-        return { results: [], lastVisibleDoc: null, errorMessage: "Sorry, but we currently can't handle that many filter options at the same time.\
-        Please remove some and try again." };
+        return { results: [], lastVisibleDoc: null, errorMessage: "Sorry, but we currently can't handle that many filter options at the same time. Please remove some and try again.", totalCount: 0 };
       }
     }
-    return { results: [], lastVisibleDoc: null, errorMessage: "Oops, something went wrong. Maybe try a different search?" };
+    return { results: [], lastVisibleDoc: null, errorMessage: "Oops, something went wrong. Maybe try a different search?", totalCount: 0 };
   }
-};
-
-export const getNumEntries = async (): Promise<number>  => {
-  const collectionRef = collection(firestore, 'entries');
-  const num = await getCountFromServer(collectionRef);
-  return num.data().count;
 };
