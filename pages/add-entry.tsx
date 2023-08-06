@@ -635,12 +635,19 @@ const FormContainer = styled(Form)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 1rem;
-  width: 70%;
+  width: 50%;
+
+  @media (max-width: 1500px) {
+    width: 70%;
+  }
 
   @media (max-width: 800px) {
-    grid-template-columns: 1fr;
     padding: 1rem;
-    width: 90%;
+    width: 100%;
+  }
+
+  @media (max-width: 550px) {
+    grid-template-columns: 1fr;
   }
 `;
 

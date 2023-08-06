@@ -17,9 +17,8 @@ type PaginationProps = {
   goNext: () => void;
   goLast: () => void;
   onPageClick: (pageNumber: number) => void;
+  stepByStep?: boolean;
 };
-
-const MAX_VISIBLE_PAGES = 3;
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -29,6 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({
   goNext,
   goLast,
   onPageClick,
+  stepByStep,
 }) => {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
@@ -48,7 +48,8 @@ const Pagination: React.FC<PaginationProps> = ({
     };
   }, [])
 
-  const getPageNumbersSubset = () => {
+  const getPageNumbersSubset = (dontShowLastPage: boolean | undefined) => {
+    const MAX_VISIBLE_PAGES = dontShowLastPage ? 4 : 3;
     if (totalPages <= MAX_VISIBLE_PAGES) {
       return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
@@ -63,7 +64,11 @@ const Pagination: React.FC<PaginationProps> = ({
       visiblePages = [1, '...', ...visiblePages.slice(1)];
     }
     if (lastPage < totalPages) {
-      visiblePages = [...visiblePages.slice(0, visiblePages.length - 1), '...', totalPages];
+      if (dontShowLastPage) {
+        visiblePages = [...visiblePages.slice(0, currentPage == 1 ? visiblePages.length - 2 : visiblePages.length - 1), '...'];
+      } else {
+        visiblePages = [...visiblePages.slice(0, visiblePages.length - 1), '...', totalPages];
+      }
     }
 
     return visiblePages;
@@ -73,7 +78,7 @@ const Pagination: React.FC<PaginationProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const pageNumbers = getPageNumbersSubset();
+  const pageNumbers = getPageNumbersSubset(stepByStep);
 
   return (
     <PaginationContainer>
@@ -102,9 +107,9 @@ const Pagination: React.FC<PaginationProps> = ({
       <PageButton onClick={goNext} disabled={currentPage === totalPages}>
         <Image src={PaginationNext} width={20} height={20} alt="Next" />
       </PageButton>
-      <PageButton onClick={goLast} disabled={currentPage === totalPages}>
+      {!stepByStep && <PageButton onClick={goLast} disabled={currentPage === totalPages}>
         <Image src={PaginationLast} width={20} height={20} alt="Last" />
-      </PageButton>
+      </PageButton>}
       {showScrollToTop &&
         <PageButton onClick={scrollToTop}>
           <Arrow src={ScrollToTopIcon} width={20} height={20} alt="Scroll To Top" />
