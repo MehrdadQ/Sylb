@@ -5,11 +5,14 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Slide } from "react-awesome-reveal";
 import { Nav, NavItem, Navbar } from 'react-bootstrap';
+import CustomNavBar from "../components/Navbar"
 import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import ScrollDownArrow from '../components/ScrollDownArrow';
 import { getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
+import Image1 from "../public/landingPage1.png"
+import Image2 from "../public/landingPage2.png"
 import { auth } from '../utilities/firebase';
 
 
@@ -38,14 +41,18 @@ const Main: NextPage = () => {
     });
   }, [setUser])
 
-  const handleSignUpClick = () => {
+  const goToSignup = () => {
     router.push('/signup');
   };
   
-  const handleLoginClick = () => {
+  const goToLogin = () => {
     router.push('/login');
   }
   
+  const goToHome = () => {
+    router.push('/home');
+  }
+
   const scrollToLearnMore = () => {
     const element = document.getElementById('learn-more');
     if (element) {
@@ -55,36 +62,39 @@ const Main: NextPage = () => {
 
   return (
     <>
-      <Sticky>
-        <Navbar>
-          <Navbar.Brand href="#">
-            <Image
-              src="logo.svg"
-              width="50"
-              height="50"
-              className="d-inline-block align-top"
-              alt="Logo"
-            />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <ButtonContainer>
-              <Nav>
-                <NavItem>
-                  <NavButton onClick={handleSignUpClick}>
-                    Sign up
-                  </NavButton>
-                </NavItem>
-                <NavItem>
-                  <NavButton onClick={handleLoginClick}>
-                    Log in
-                  </NavButton>
-                </NavItem>
-              </Nav>
-            </ButtonContainer>
-          </Navbar.Collapse>
-        </Navbar> 
-      </Sticky>
+      {!user ?
+        <Sticky>
+          <Navbar>
+            <Navbar.Brand href="#">
+              <Image
+                src="logo.svg"
+                width="50"
+                height="50"
+                className="d-inline-block align-top"
+                alt="Logo"
+              />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              <ButtonContainer>
+                <Nav>
+                  <NavItem>
+                    <NavButton onClick={goToSignup}>
+                      Sign up
+                    </NavButton>
+                  </NavItem>
+                  <NavItem>
+                    <NavButton onClick={goToLogin}>
+                      Log in
+                    </NavButton>
+                  </NavItem>
+                </Nav>
+              </ButtonContainer>
+            </Navbar.Collapse>
+          </Navbar> 
+        </Sticky> : 
+        <CustomNavBar/>
+      }
       <FullHeightDiv>
         <Slide className="slide" style={{marginTop: '-100px'}}>
           <Section id="intro">
@@ -92,16 +102,21 @@ const Main: NextPage = () => {
               <MainTitle>Welcome to <span>Sylb.io</span>,</MainTitle>
               <MainText>The ultimate course information guide for UofT students</MainText>
               <ButtonGroup>
-                <CallToActionBtn onClick={handleSignUpClick}>
-                  Sign Up For Free
-                </CallToActionBtn>
+                {!user ? 
+                  <CallToActionBtn onClick={goToSignup}>
+                    Sign Up For Free
+                  </CallToActionBtn> :
+                  <CallToActionBtn onClick={goToHome}>
+                    Home
+                  </CallToActionBtn>
+                }
                 <CallToActionBtn onClick={scrollToLearnMore}>
                   Learn More
                 </CallToActionBtn>
               </ButtonGroup>
             </TextSection>
             <ImgContainer>
-              <Image src="/../public/landingPage1.png" alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
+              <Image src={Image1} alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
           </Section>
         </Slide>
@@ -118,7 +133,7 @@ const Main: NextPage = () => {
         <Slide direction='right' className="slide" >
           <Section>
             <ImgContainer>
-              <Image src="/../public/landingPage2.png" alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
+              <Image src={Image2} alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
             <TextSection>
               <Title>Your Secret Weapon for Course Selection</Title>
