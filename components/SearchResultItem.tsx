@@ -7,7 +7,7 @@ import { userState } from '../utilities/atoms';
 import CheckmarkIcon from "../public/checkmark.svg";
 import Image from 'next/image';
 
-const SearchResultItem = ({ entry, openInNewTab }: { entry: EntryResultInfoCompact, openInNewTab: boolean }) => {
+const SearchResultItem = ({ entry, openInNewTab, showCourseAverage = false }: { entry: EntryResultInfoCompact, openInNewTab: boolean, showCourseAverage?: boolean }) => {
   const router = useRouter();
   const user = useRecoilValue(userState);
 
@@ -28,6 +28,9 @@ const SearchResultItem = ({ entry, openInNewTab }: { entry: EntryResultInfoCompa
       <div>
         <h6>📅: {entry.semester}</h6>
         <h6>👨‍🏫: {entry.professor}</h6>
+        {showCourseAverage &&
+          <h6>🎯: {entry.courseAverage}</h6>
+        }
       </div>
       <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
         {user?.hasAccessTo.includes(entry.id) && <>

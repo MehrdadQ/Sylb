@@ -42,6 +42,7 @@ export type EntryResultInfoCompact = {
   professor: string;
   postTime: Date | number | null;
   campus: string;
+  courseAverage: string;
 };
 
 export type UserInfo = {

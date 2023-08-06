@@ -348,7 +348,7 @@ const AdvancedSearch: NextPage = () => {
           <ResultContainer>
             {searchResults.map((entry, index) => {
               return (
-                <SearchResultItem entry={entry} key={index} openInNewTab={true}/>
+                <SearchResultItem entry={entry} key={index} openInNewTab={true} showCourseAverage={courseAverage.length !== 0}/>
               )
             })}
           </ResultContainer>
