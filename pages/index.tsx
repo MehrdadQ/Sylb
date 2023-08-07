@@ -14,7 +14,7 @@ import { userState } from '../utilities/atoms';
 import Image1 from "../public/landingPage1.png"
 import Image2 from "../public/landingPage2.png"
 import { auth } from '../utilities/firebase';
-
+import { NextSeo } from 'next-seo';
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
@@ -62,6 +62,10 @@ const Main: NextPage = () => {
 
   return (
     <>
+      <NextSeo
+        title="Sylb"
+        description="Get UofT syllabuses and course information for free."
+      />
       {!user ?
         <Sticky>
           <Navbar>

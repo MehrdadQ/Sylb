@@ -1,4 +1,5 @@
 import 'firebase/compat/storage';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -61,6 +62,10 @@ const SearchPage = () => {
 
   return (
     <>
+      <NextSeo
+        title={searchQuery ? `${searchQuery} - Search Results` : "Sylb"}
+        description={`Download ${searchQuery} syllabus for free. Get ${searchQuery} course information sheet for free.`}
+      />
       <Navbar />
       {isLoading || !searchQuery ?
         <LoadingImage src={LoadingIcon} alt='loading'/> :

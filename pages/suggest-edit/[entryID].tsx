@@ -2,6 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 import { doc, getDoc } from 'firebase/firestore';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -191,6 +192,10 @@ const SuggestEditPage: React.FC = () => {
 
   return (
     <>
+      <NextSeo
+        title={info ? `${info.courseCode} - Edit` : "Sylb"}
+        description={`Suggest edits to this ${info.courseCode} entry.`}
+      />
       <Navbar />
       {isLoading || !entryID ?
         <LoadingImage src={LoadingIcon} alt='loading'/> : notFound ?

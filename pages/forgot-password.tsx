@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -38,35 +39,41 @@ const ForgotPasswordPage: NextPage = () => {
   }
 
   return (
-    <Container>
-      <InputContainer>
-        <FormContainer>
-          <Form onSubmit={handleResetPassword}>
-            <Label>Email:</Label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
-            />
-            {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
-            <ButtonGroup>
-              <Button
-                onClick={goToLogin}
-              >
-                Back to Login
-              </Button>
-              <Button
-                type="submit"
-                style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
-                disabled={errors.length > 0 || email === ""}
-              >
-                Reset Password
-              </Button>
-            </ButtonGroup>
-          </Form>
-        </FormContainer>
-      </InputContainer>
-    </Container>
+    <>
+      <NextSeo
+        title="Reset Password - Sylb"
+        description="Reset your Sylb account password."
+      />
+      <Container>
+        <InputContainer>
+          <FormContainer>
+            <Form onSubmit={handleResetPassword}>
+              <Label>Email:</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e: any) => setEmail(e.target.value)}
+              />
+              {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
+              <ButtonGroup>
+                <Button
+                  onClick={goToLogin}
+                >
+                  Back to Login
+                </Button>
+                <Button
+                  type="submit"
+                  style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
+                  disabled={errors.length > 0 || email === ""}
+                >
+                  Reset Password
+                </Button>
+              </ButtonGroup>
+            </Form>
+          </FormContainer>
+        </InputContainer>
+      </Container>
+    </>
   )
 };
 

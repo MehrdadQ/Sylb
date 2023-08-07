@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
-import { DocumentData, DocumentSnapshot, Query, collection, limit, query, startAfter, where } from "firebase/firestore";
+import { DocumentData, DocumentSnapshot, where } from "firebase/firestore";
 import { NextPage } from "next";
+import { NextSeo } from 'next-seo';
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
@@ -16,7 +17,7 @@ import LoadingIcon from "../public/loading.svg";
 import TrashIcon from '../public/trash.svg';
 import { getAdvancedSearchResults, getUserInfo } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
-import { auth, firestore } from "../utilities/firebase";
+import { auth } from "../utilities/firebase";
 import {
   EntryResultInfoCompact, autofailOptions, booleanOptions, campusOptions, courseAverageOptions,
   courseDeliveryOptions, multipleChoiceOptions, semesterDropdownOptions, tutorialOptions
@@ -199,6 +200,10 @@ const AdvancedSearch: NextPage = () => {
 
   if (user) return (
     <>
+      <NextSeo
+        title="Advanced Search - Sylb"
+        description="Search for UofT courses and get access to syllabuses for free."
+      />
       <Navbar />
       <MainContainer>
         <FilterToggleButton className={toggleFilters ? 'button-enabled' : 'button-disabled'} onClick={() => setToggleFilters(!toggleFilters)}>

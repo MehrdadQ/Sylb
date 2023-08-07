@@ -2,6 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/storage';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -300,6 +301,10 @@ const AddEntryPage: React.FC = () => {
 
   return (
     <>
+      <NextSeo
+        title="Add Syllabus - Sylb"
+        description="Share your UofT course information and syllabus for others."
+      />
       <Navbar />
       <Container>
         <FormContainer onSubmit={handleSubmit}>

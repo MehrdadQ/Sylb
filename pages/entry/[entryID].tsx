@@ -2,6 +2,7 @@ import axios from 'axios';
 import { onAuthStateChanged } from "firebase/auth";
 import 'firebase/compat/storage';
 import fileDownload from 'js-file-download';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -18,7 +19,6 @@ import { loadingState, userState } from '../../utilities/atoms';
 import { auth } from '../../utilities/firebase';
 import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
 import { EntryResultInfo } from '../../utilities/types';
-
 
 const SearchPage = () => {
   const router = useRouter();
@@ -156,6 +156,10 @@ const SearchPage = () => {
 
   return (
     <>
+      <NextSeo
+        title={info ? `${info?.courseCode} - ${info?.semester}` : "Sylb"}
+        description={`Download ${info?.courseCode!} syllabus for free. ${info?.courseCode} - ${info?.semester} - ${info?.professor}`}
+      />
       <Navbar />
       {(isLoading && !showReportModal) || !entryID ?
         <LoadingImage src={LoadingIcon} alt='loading'/> : notFound ?
