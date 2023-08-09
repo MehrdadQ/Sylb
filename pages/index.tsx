@@ -18,7 +18,7 @@ import { NextSeo } from 'next-seo';
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
-  Where do we find the syllabus? What was the course average been last semester? \
+  Where do we find the syllabus? What was the course average last semester? \
   Are tutorials mandatory? Are the lectures recorded?",
   "Introducing Sylb! All your questions answered. Sign up for free and unlock the power of \
   knowledge-sharing. 📚💡",
@@ -103,7 +103,7 @@ const Main: NextPage = () => {
         <Slide className="slide" style={{marginTop: '-100px'}}>
           <Section id="intro">
             <TextSection>
-              <MainTitle>Welcome to <span>Sylb.io</span>,</MainTitle>
+              <MainTitle>Welcome to <span>Sylb</span>,</MainTitle>
               <MainText>The ultimate course information guide for UofT students</MainText>
               <ButtonGroup>
                 {!user ? 

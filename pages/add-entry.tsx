@@ -365,7 +365,7 @@ const AddEntryPage: React.FC = () => {
                     setCourseData({ ...courseData, campus: parsedValue as EntryInfo['campus']});
                   }}
                 >
-                  <option value="undefined">Select campus</option>
+                  <option value="undefined">Select campus (required)</option>
                   <option value="UTSG">UTSG</option>
                   <option value="UTSC">UTSC</option>
                   <option value="UTM">UTM</option>
