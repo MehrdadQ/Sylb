@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { DocumentData, DocumentSnapshot } from "firebase/firestore";
 import { NextPage } from "next";
+import { NextSeo } from 'next-seo';
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
@@ -28,6 +29,7 @@ const SortByPage: NextPage = () => {
   const [cachedSearchResults, setCachedSearchResults] = useState<{ [pageNumber: number]: EntryResultInfoCompact[] }>({});
   const [numPages, setNumPages] = useState<number>(0);
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [sortByDisplayValue, setSortByDisplayValue] = useState<string | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
   const [user, setUser] = useRecoilState(userState);
@@ -39,10 +41,13 @@ const SortByPage: NextPage = () => {
     const { sortBy: sortBy } = router.query as { sortBy: string };
     if (sortBy === "courseAverage") {
       setSortBy("courseAverageNumValue");
+      setSortByDisplayValue("See top UofT courses by course average.");
     } else if (sortBy === "semester") {
       setSortBy("semesterNumValue");
+      setSortByDisplayValue("See latest UofT courses and syllabuses.");
     } else if (sortBy === "postTime") {
       setSortBy(sortBy);
+      setSortByDisplayValue("See the most recently added UofT course syllabuses.");
     } else {
       goTo404();
     }
@@ -140,6 +145,10 @@ const SortByPage: NextPage = () => {
 
   if (user) return (
     <>
+      <NextSeo
+        title="Sylb"
+        description={sortByDisplayValue}
+      />
       <Navbar />
       <MainContainer>
         {
@@ -248,7 +257,8 @@ const MainContainer = styled.div`
 `;
 
 const LoadingImage = styled(Image)`
-  margin-top: 100px;
+  margin-top: 50px;
+  margin-bottom: 50px;
   width: 50px;
   height: auto;
 `;

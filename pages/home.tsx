@@ -1,5 +1,6 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { NextPage } from "next";
+import { NextSeo } from 'next-seo';
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
@@ -59,6 +60,10 @@ const Home: NextPage = () => {
 
   if (user) return (
     <>
+      <NextSeo
+        title="Home - Sylb"
+        description="Search for UofT courses and get access to syllabuses for free."
+      />
       <Navbar />
       <MainContainer>
         <h2>Search for a course...</h2>

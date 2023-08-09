@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/CheckoutButton.jsx", "pages/api/checkout_sessions.js", "utilities/getStripe.js"],
   "exclude": ["node_modules"]
 }

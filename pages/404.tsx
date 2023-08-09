@@ -1,9 +1,10 @@
 import { NextPage } from 'next';
-import Navbar from '../components/Navbar';
-import styled from 'styled-components';
-import Image404 from '../public/404.png'
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import styled from 'styled-components';
+import Navbar from '../components/Navbar';
+import Image404 from '../public/404.png';
 
 const Custom404: NextPage = () => {
   const router = useRouter();
@@ -12,9 +13,12 @@ const Custom404: NextPage = () => {
     router.push("/home")
   }
 
-
   return (
-    <div>
+    <>
+      <NextSeo
+        title="Sylb - Page not found"
+        description="Sylb - Page not found"
+      />
       <Navbar/>
       <Container>
         <TextSection>
@@ -23,7 +27,7 @@ const Custom404: NextPage = () => {
         </TextSection>
         <Picture src={Image404} alt='404' width={500} style={{maxWidth: "100%", height: "auto"}}/>
       </Container>
-    </div>
+    </>
   );
 };
 

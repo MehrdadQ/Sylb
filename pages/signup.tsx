@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -112,66 +113,72 @@ const SignUpPage: NextPage = () => {
   };
 
   return (
-    <SignUpPageContainer>
-      <InputContainer>
-        {!isEmail ? <SignupOptionsContainer>
-          <Title>Create an account</Title>
-          <SignupButton style={{marginBottom: "1rem"}} onClick={handleGoogleSignup}>
-            <Image src={GoogleSvg} width={25} height={25} alt='Google logo'/>
-            <div>Sign up with Google</div>
-          </SignupButton>
-          <SignupButton onClick={() => setIsEmail(true)}>
-            <Image src={EmailSvg} width={25} height={25} alt='Email logo'/>
-            <div>Sign up using Email</div>
-          </SignupButton>
-          <DividerLine/>
-          <LoginMessage>
-            Already have an account?{' '}
-            <span
-              onClick={goToLogin}
-              tabIndex={0}
-              ref={spanRef}
-              onKeyDown={handleKeyDown}
-            >
-              Log in here.
-            </span>
-          </LoginMessage>
-        </SignupOptionsContainer> :
-        <FormContainer>
-          <SignUpForm onSubmit={handleSignup}>
-            <Label>Email:</Label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
-            />
-            <Label>Password:</Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e: any) => setPassword(e.target.value)}
-            />
-            <Label>Confirm Password:</Label>
-            <Input
-              type="password"
-              value={passwordConfirm}
-              onChange={(e: any) => setPasswordConfirm(e.target.value)}
-            />
-            {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
-            <ButtonGroup>
-              <Button onClick={() => setIsEmail(false)}>Back to sign up options</Button>
-              <Button
-                type="submit"
-                style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
-                disabled={errors.length > 0 || email === ""}
+    <>
+      <NextSeo
+        title="Sign up - Sylb"
+        description="Create your Sylb account for free and get access to UofT course syllabuses for free."
+      />
+      <SignUpPageContainer>
+        <InputContainer>
+          {!isEmail ? <SignupOptionsContainer>
+            <Title>Create an account</Title>
+            <SignupButton style={{marginBottom: "1rem"}} onClick={handleGoogleSignup}>
+              <Image src={GoogleSvg} width={25} height={25} alt='Google logo'/>
+              <div>Sign up with Google</div>
+            </SignupButton>
+            <SignupButton onClick={() => setIsEmail(true)}>
+              <Image src={EmailSvg} width={25} height={25} alt='Email logo'/>
+              <div>Sign up using Email</div>
+            </SignupButton>
+            <DividerLine/>
+            <LoginMessage>
+              Already have an account?{' '}
+              <span
+                onClick={goToLogin}
+                tabIndex={0}
+                ref={spanRef}
+                onKeyDown={handleKeyDown}
               >
-                Sign Up
-              </Button>
-            </ButtonGroup>
-          </SignUpForm>
-        </FormContainer>}
-      </InputContainer>
-    </SignUpPageContainer>
+                Log in here.
+              </span>
+            </LoginMessage>
+          </SignupOptionsContainer> :
+          <FormContainer>
+            <SignUpForm onSubmit={handleSignup}>
+              <Label>Email:</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e: any) => setEmail(e.target.value)}
+              />
+              <Label>Password:</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e: any) => setPassword(e.target.value)}
+              />
+              <Label>Confirm Password:</Label>
+              <Input
+                type="password"
+                value={passwordConfirm}
+                onChange={(e: any) => setPasswordConfirm(e.target.value)}
+              />
+              {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
+              <ButtonGroup>
+                <Button onClick={() => setIsEmail(false)}>Back to sign up options</Button>
+                <Button
+                  type="submit"
+                  style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
+                  disabled={errors.length > 0 || email === ""}
+                >
+                  Sign Up
+                </Button>
+              </ButtonGroup>
+            </SignUpForm>
+          </FormContainer>}
+        </InputContainer>
+      </SignUpPageContainer>
+    </>
   );
 };
 

@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -107,64 +108,70 @@ const LoginPage: NextPage = () => {
   };
 
   return (
-    <LoginPageContainer>
-      <InputContainer>
-        {!isEmail ? <LoginOptionsContainer>
-          <Title>Login to your account</Title>
-          <LoginButton style={{marginBottom: "1rem"}} onClick={handleGoogleLogin}>
-            <Image src={GoogleSvg} width={25} height={25} alt='Google logo'/>
-            <div>Log in with Google</div>
-          </LoginButton>
-          <LoginButton onClick={() => {setIsEmail(true); setErrors([])}}>
-            <Image src={EmailSvg} width={25} height={25} alt='Email logo'/>
-            <div>Log in using Email</div>
-          </LoginButton>
-          {errors.length > 0 && <ErrorMessage style={{padding: "1rem", margin: "0"}}>{errors[0]}</ErrorMessage>}
-          <DividerLine/>
-          <LoginMessage>
-            Don&apos;t have an account?{' '}
-            <span
-              onClick={goToSignup}
-              tabIndex={0}
-              ref={spanRef}
-              onKeyDown={handleKeyDown}
-            >
-              Create one here.
-            </span>
-          </LoginMessage>
-        </LoginOptionsContainer> :
-        <FormContainer>
-          <LoginForm onSubmit={handleLogin}>
-            <Label>Email:</Label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
-            />
-            <Label>Password:</Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e: any) => setPassword(e.target.value)}
-            />
-            <ForgotPasswordMessage>
-              <p onClick={goToForgotPassword}>Forgot your password?</p>
-            </ForgotPasswordMessage>
-            {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
-            <ButtonGroup>
-              <Button onClick={() => {setIsEmail(false); setErrors([])}}>Back to login options</Button>
-              <Button
-                type="submit"
-                style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
-                disabled={errors.length > 0 || email === "" || password === ""}
+    <>
+      <NextSeo
+        title="Login - Sylb"
+        description="Login to your Sylb account."
+      />
+      <LoginPageContainer>
+        <InputContainer>
+          {!isEmail ? <LoginOptionsContainer>
+            <Title>Login to your account</Title>
+            <LoginButton style={{marginBottom: "1rem"}} onClick={handleGoogleLogin}>
+              <Image src={GoogleSvg} width={25} height={25} alt='Google logo'/>
+              <div>Log in with Google</div>
+            </LoginButton>
+            <LoginButton onClick={() => {setIsEmail(true); setErrors([])}}>
+              <Image src={EmailSvg} width={25} height={25} alt='Email logo'/>
+              <div>Log in using Email</div>
+            </LoginButton>
+            {errors.length > 0 && <ErrorMessage style={{padding: "1rem", margin: "0"}}>{errors[0]}</ErrorMessage>}
+            <DividerLine/>
+            <LoginMessage>
+              Don&apos;t have an account?{' '}
+              <span
+                onClick={goToSignup}
+                tabIndex={0}
+                ref={spanRef}
+                onKeyDown={handleKeyDown}
               >
-                Log In
-              </Button>
-            </ButtonGroup>
-          </LoginForm>
-        </FormContainer>}
-      </InputContainer>
-    </LoginPageContainer>
+                Create one here.
+              </span>
+            </LoginMessage>
+          </LoginOptionsContainer> :
+          <FormContainer>
+            <LoginForm onSubmit={handleLogin}>
+              <Label>Email:</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e: any) => setEmail(e.target.value)}
+              />
+              <Label>Password:</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e: any) => setPassword(e.target.value)}
+              />
+              <ForgotPasswordMessage>
+                <p onClick={goToForgotPassword}>Forgot your password?</p>
+              </ForgotPasswordMessage>
+              {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
+              <ButtonGroup>
+                <Button onClick={() => {setIsEmail(false); setErrors([])}}>Back to login options</Button>
+                <Button
+                  type="submit"
+                  style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
+                  disabled={errors.length > 0 || email === "" || password === ""}
+                >
+                  Log In
+                </Button>
+              </ButtonGroup>
+            </LoginForm>
+          </FormContainer>}
+        </InputContainer>
+      </LoginPageContainer>
+    </>
   );
 };
 

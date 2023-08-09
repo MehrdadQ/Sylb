@@ -1,7 +1,7 @@
 
 import { FirebaseError } from '@firebase/util';
 import { DocumentData, DocumentSnapshot, Query, QueryFieldFilterConstraint, QueryLimitConstraint, QuerySnapshot, addDoc, arrayUnion, collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, updateDoc, where } from 'firebase/firestore';
-import { firestore } from './firebase';
+import { auth, firestore } from './firebase';
 import { EntryInfo, EntryResultInfo, EntryResultInfoCompact, UserInfo } from './types';
 
 export const addUserToCollection = async (uid: string) => {
