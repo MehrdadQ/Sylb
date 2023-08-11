@@ -232,3 +232,18 @@ export const getSortedResults =
     return { results: [], lastVisibleDoc: null, errorMessage: "Oops, something went wrong. Maybe try a different search?", totalCount: 0 };
   }
 };
+
+export const confirmSessionId = async (session_id: string) => {
+  try {
+    const response = await fetch(`/api/get-session?session_id=${session_id}`);
+    const data = await response.json();
+
+    if (data.status === 'paid' || data.status === 'completed') {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+};
