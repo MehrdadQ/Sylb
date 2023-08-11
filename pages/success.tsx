@@ -53,7 +53,7 @@ const Success = () => {
         <MainContainer>
           {valid ?
             <Container>
-              <Header>Payment Successful! You now have {user?.credits! > 1000 ? 'unlimited' : user?.credits} credits!</Header>
+              <Header>Payment Successful! You now have {user?.credits! > 10000 ? 'unlimited' : user?.credits} credits!</Header>
               <Button onClick={goToHome}>Go to Home</Button>
             </Container> :
             <Container>

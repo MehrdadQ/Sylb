@@ -33,7 +33,7 @@ const SearchResultItem = ({ entry, openInNewTab, showCourseAverage = false }: { 
         }
       </div>
       <div style={{display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-        {user?.hasAccessTo.includes(entry.id) && <>
+        {(user?.hasAccessTo.includes(entry.id) || user?.credits! > 10000) && <>
           <Image src={CheckmarkIcon} alt='loading' style={{width: "15px", height: 'auto', marginRight: '6px', marginBottom: '-2px'}}/>
         </>}
         <TimeAgo>{timeAgo(entry?.postTime)}</TimeAgo>

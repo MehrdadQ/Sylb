@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { NextPage } from "next";
 import { NextSeo } from 'next-seo';
+import Image from 'next/image';
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
@@ -8,6 +9,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import SearchResultItem from "../components/SearchResultItem";
+import LoadingIcon from "../public/loading.svg";
 import { getLatestSubmissions, getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from "../utilities/firebase";
@@ -50,15 +52,11 @@ const Home: NextPage = () => {
     }
   };
 
-  const goToInfoPage = (entryID: string) => {
-    window.open(`/entry/${entryID}`, '_blank');
-  };
-
   const goToAdvancedSearchPage = () => {
     router.push(`/advanced-search`);
   };
 
-  if (user) return (
+  return (
     <>
       <NextSeo
         title="Home - Sylb"
@@ -87,13 +85,18 @@ const Home: NextPage = () => {
         </Container>
         <Container>
           <h3>Most Recent Submissions</h3>
-          <ResultContainer>
-            {latestSubmissions.map((entry, index) => {
-              return (
-                <SearchResultItem entry={entry} key={index} openInNewTab={false}/>
-              )
-            })}
-          </ResultContainer>
+          {latestSubmissions.length === 0 ?
+          <Centered>
+            <Image src={LoadingIcon} alt='loading' style={{width: "48px", height: 'auto', marginTop: "4rem"}}/>
+          </Centered> :
+            <ResultContainer>
+              {latestSubmissions.map((entry, index) => {
+                return (
+                  <SearchResultItem entry={entry} key={index} openInNewTab={false}/>
+                )
+              })}
+            </ResultContainer>
+          }
         </Container>
       </MainContainer>
     </>
@@ -214,4 +217,11 @@ const AdvancedSearchButton = styled.button`
     width: 100%;
   }
 `;
+
+const Centered = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
+
 export default Home;

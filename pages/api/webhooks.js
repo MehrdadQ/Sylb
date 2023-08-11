@@ -73,11 +73,9 @@ async function handleWebhookEvent(req, res) {
       } else if (purchased.includes("10")) {
         await updateUserCredits(userUid, 10)
       } else {
-        await updateUserCredits(userUid, 9999)
+        await updateUserCredits(userUid, 15000)
       }
       break;
-
-    // Add other event types to handle as needed
 
     default:
   }

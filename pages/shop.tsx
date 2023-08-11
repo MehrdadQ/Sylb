@@ -1,16 +1,18 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import 'firebase/compat/storage';
 import { NextSeo } from 'next-seo';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
 import CheckoutButton from "../components/CheckoutButton";
 import Navbar from '../components/Navbar';
+import LoadingIcon from "../public/loading.svg";
 import { getUserInfo } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
-import styled from 'styled-components';
 
 const SuggestEditPage: React.FC = () => {
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
@@ -72,58 +74,71 @@ const SuggestEditPage: React.FC = () => {
         description="Get more Sylb credits or purchase premium to get access to all UofT syllabuses."
       />
       <Navbar />
-      <MainContainer>
-        <Container>
-          <h3>You currently have {user?.credits!} Credits</h3>
-          <InfoText>The credit system serves to encourage contributions from all users,
-            helping our syllabus collection grow for everyone&apos;s benefit.
-            </InfoText>
-          <InfoText>
-            Adding your syllabus earns you credits, so we recommend heading to
-            the <span onClick={goToAddEntry}>Add Entry page</span> if you haven&apos;t done so already.
-          </InfoText>
-          <InfoText>
-            Pro tip: You can get access to previous course pages on Quercus by going
-            to <span><a href='https://q.utoronto.ca/courses' target='blank'>https://q.utoronto.ca/courses</a></span>
-            . You should be able to see most of your previous courses under Past Enrollments!
-          </InfoText>
-          <InfoText>
-            If you need more credits, explore the following options:
-          </InfoText>
-          <CardContainer>
-            <Card>
-              <h4>5 Credits</h4>
-              <h5>$2.79</h5>
-              <CheckoutButton
-                name="5 Sylb Credits"
-                description="Get 5 Sylb Credits which can be used to purchase access to syllabus files."
-                price="279"
-              />
-            </Card>
-            <Card>
-              <h4>10 Credits</h4>
-              <h5>$4.79</h5>
-              <CheckoutButton
-                name="10 Sylb Credits"
-                description="Get 10 Sylb Credits which can be used to purchase access to syllabus files."
-                price="479"
-              />
-            </Card>
-            <Card>
-              <h4>Unlimited Credits</h4>
-              <h5>$9.99</h5>
-              <CheckoutButton
-                name="Unlimited Credits"
-                description="Get unlimited Sylb Credits which can be used to purchase access to syllabus files."
-                price="999"
-              />
-            </Card>
-          </CardContainer>
-          <p style={{color: "#c3c3c3", textAlign: "center"}}>
-            All transactions are done through <span><a href='https://stripe.com' target='blank'>Stripe</a></span>!
-          </p>
-        </Container>
-      </MainContainer>
+      {user && !isLoading ?
+        <MainContainer>
+          {user?.credits! > 10000 ?
+            <Container>
+              <h3 style={{textAlign: "center", marginTop: "3rem"}}>
+                You have unlimited credits!
+              </h3>
+              
+            </Container> :
+            <Container>
+              <h3>You currently have {user?.credits!} Credit{user?.credits! > 1 ? 's' : ''}</h3>
+              <InfoText>The credit system serves to encourage contributions from all users,
+                helping our syllabus collection grow for everyone&apos;s benefit.
+                </InfoText>
+              <InfoText>
+                Adding syllabus files earn you credits, so we recommend heading to
+                the <span onClick={goToAddEntry}>Add Entry page</span> if you haven&apos;t done so already.
+              </InfoText>
+              <InfoText>
+                Pro tip: You can get access to previous course pages on Quercus by going
+                to <span><a href='https://q.utoronto.ca/courses' target='blank'>https://q.utoronto.ca/courses</a></span>
+                . You should be able to see most of your previous courses under Past Enrollments!
+              </InfoText>
+              <InfoText>
+                If you need more credits, explore the following options:
+              </InfoText>
+              <CardContainer>
+                <Card>
+                  <h4>5 Credits</h4>
+                  <h5>$2.79</h5>
+                  <CheckoutButton
+                    name="5 Sylb Credits"
+                    description="Get 5 Sylb Credits which can be used to purchase access to syllabus files."
+                    price="279"
+                  />
+                </Card>
+                <Card>
+                  <h4>10 Credits</h4>
+                  <h5>$4.79</h5>
+                  <CheckoutButton
+                    name="10 Sylb Credits"
+                    description="Get 10 Sylb Credits which can be used to purchase access to syllabus files."
+                    price="479"
+                  />
+                </Card>
+                <Card>
+                  <h4>Unlimited Credits</h4>
+                  <h5>$9.99</h5>
+                  <CheckoutButton
+                    name="Unlimited Credits"
+                    description="Get unlimited Sylb Credits which can be used to purchase access to syllabus files."
+                    price="999"
+                  />
+                </Card>
+              </CardContainer>
+              <p style={{color: "#c3c3c3", textAlign: "center"}}>
+                Transactions are done through <span><a href='https://stripe.com' target='blank'>Stripe</a></span>!
+              </p>
+            </Container>
+          }
+        </MainContainer> :
+        <MainContainer>
+          <Image src={LoadingIcon} alt='loading' style={{width: "48px", height: 'auto', marginTop: "4rem"}}/>
+        </MainContainer>
+      }
     </>
   );
 };

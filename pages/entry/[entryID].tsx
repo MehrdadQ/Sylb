@@ -135,7 +135,7 @@ const SearchPage = () => {
   };
 
   const handleDownloadClick = () => {
-    if (userHasAccess()) {
+    if (userHasAccess() || user?.credits! > 10000) {
       handleDownload(info?.syllabusLink!, `${info?.courseCode}_${info?.semester}_${info?.professor}.pdf`);
     } else {
       setShowDownloadConfirmModal(true);
@@ -254,7 +254,7 @@ const SearchPage = () => {
                 <Button onClick={spendCreditsAndDownload} style={{width: "200px", fontSize: "18px"}}>
                   {isLoading ?
                     <Image src={LoadingIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
-                  : <>Confirm</>
+                  : <>Download</>
                   }
                 </Button>
               </Modal.Footer>

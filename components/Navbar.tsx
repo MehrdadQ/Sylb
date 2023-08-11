@@ -1,3 +1,4 @@
+import { onAuthStateChanged } from 'firebase/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,10 +10,11 @@ import Navbar from 'react-bootstrap/Navbar';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import CreditIcon from '../public/credit.svg';
+import InfiniteIcon from '../public/infinite.svg';
+import LoadingIcon from "../public/loading.svg";
+import { getUserInfo } from '../utilities/api';
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { getUserInfo } from '../utilities/api';
 
 const CustomNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,10 +39,6 @@ const CustomNavbar = () => {
 
   const goToLandingPage = () => {
     router.push('/');
-  };
-  
-  const goToHomePage = () => {
-    router.push('/home');
   };
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -73,7 +71,13 @@ const CustomNavbar = () => {
               <Nav.Link as={Link} href="/home" className={isActive("/home")}>Home</Nav.Link>
               <Nav.Link as={Link} href="/shop" className={isActive("/shop")}>
                 <Image src={CreditIcon} width={25} height={25} alt='credit' />
-                Credits: {user?.credits}
+                Credits:{' '}
+                {!user ? 
+                  <Image src={LoadingIcon} alt='loading' style={{width: "18px", height: 'auto'}}/> :
+                  user?.credits! > 10000 ?
+                  <Image src={InfiniteIcon} width={22} height={22} alt='infinite'/>
+                  : user?.credits
+                }
               </Nav.Link>
               <Nav.Link as={Link} href="/add-entry" className={isActive("/add-entry")}>Add your syllabus</Nav.Link>
               <CustomNavDropdown title="Tools" id="basic-nav-dropdown" style={{padding: "0"}}>
