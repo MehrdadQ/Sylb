@@ -1,20 +1,26 @@
 import { onAuthStateChanged } from "firebase/auth";
 import type { NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { Slide } from "react-awesome-reveal";
+import { Fade, Slide } from "react-awesome-reveal";
 import { Nav, NavItem, Navbar } from 'react-bootstrap';
-import CustomNavBar from "../components/Navbar"
 import { useRecoilState } from "recoil";
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import CustomNavBar from "../components/Navbar";
 import ScrollDownArrow from '../components/ScrollDownArrow';
+import VectorArt1 from "../public/vectorArt1.png";
+import VectorArt2 from "../public/vectorArt2.png";
+import VectorArt3 from "../public/vectorArt3.png";
+import LandingPageBg from "../public/landing_page_bg.svg";
+import LandingPageBg2 from "../public/landing_page_bg2.svg";
+import ProfessorIcon from "../public/professor.svg";
+import SyllabusIcon from "../public/syllabus.svg";
+import TargetIcon from "../public/target.svg";
 import { getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
-import Image1 from "../public/landingPage1.png"
-import Image2 from "../public/landingPage2.png"
 import { auth } from '../utilities/firebase';
-import { NextSeo } from 'next-seo';
 
 const LearnMoreText = [
   "We've all been there. It's time to select courses, and we have too many questions that need to be answered.\
@@ -23,7 +29,13 @@ const LearnMoreText = [
   "Introducing Sylb! All your questions answered. Sign up for free and unlock the power of \
   knowledge-sharing. 📚💡",
   "By students, for students. 💪"
-]
+];
+
+const HowItWorksText = [
+  "Upload Syllabus Files: Contribute by adding your course syllabus to our collection.",
+  "Earn Credits: You'll start off with 3 credits and earn more for each syllabus you upload.",
+  "Access Other Syllabus Files: Use your credits to access syllabi from other courses."
+];
 
 
 const Main: NextPage = () => {
@@ -56,7 +68,7 @@ const Main: NextPage = () => {
   const scrollToLearnMore = () => {
     const element = document.getElementById('learn-more');
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -99,8 +111,9 @@ const Main: NextPage = () => {
         </Sticky> : 
         <CustomNavBar/>
       }
-      <FullHeightDiv>
-        <Slide className="slide" style={{marginTop: '-100px'}}>
+      <FullHeightDiv style={{backgroundImage: `url(${LandingPageBg.src})`}}>
+        {/* <Image src={LandingPageBg} width={0} height={0} alt="art" style={{position: "absolute", overflow: "hidden", width: "auto", height: "100%"}}/> */}
+        <Slide className="slide" style={{marginBottom: "3rem"}}>
           <Section id="intro">
             <TextSection>
               <MainTitle>Welcome to <span>Sylb</span>,</MainTitle>
@@ -120,7 +133,7 @@ const Main: NextPage = () => {
               </ButtonGroup>
             </TextSection>
             <ImgContainer>
-              <Image src={Image1} alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
+              <Image src={VectorArt1} alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
           </Section>
         </Slide>
@@ -128,19 +141,38 @@ const Main: NextPage = () => {
           <ScrollDownArrow/>
         </div>
       </FullHeightDiv>
-      <SvgContainer>
-        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="shape-fill"></path>
-        </svg>
-      </SvgContainer>
-      <FullHeightDiv style={{backgroundColor: "#0A121E !important", paddingTop: "50px"}} id="learn-more">
+      <MiddleContainerWrapper>
+        <MiddleContainer>
+          <CenteredFade delay={400} fraction={0.5}>
+            <IconContainer style={{animationDelay: "0.4s"}}>
+              <Image src={TargetIcon} width={60} alt="target" />
+              <h5>Course Averages</h5>
+            </IconContainer>
+          </CenteredFade>
+          <CenteredFade delay={600} fraction={0.5}>
+            <IconContainer style={{animationDelay: "0.6s"}}>
+              <Image src={SyllabusIcon} width={60} alt="target" />
+              <h5>Syllabus Files</h5>
+            </IconContainer>
+          </CenteredFade>
+          <CenteredFade delay={800} fraction={0.5}>
+            <IconContainer style={{animationDelay: "0.8s"}}>
+              <Image src={ProfessorIcon} width={60} alt="target" />
+              <h5>Professor Data</h5>
+            </IconContainer>
+          </CenteredFade>
+          
+        </MiddleContainer>
+      </MiddleContainerWrapper>
+
+      <FullHeightDiv style={{backgroundImage: `url(${LandingPageBg2.src})`}} id="learn-more">
         <Slide direction='right' className="slide" >
           <Section>
             <ImgContainer>
-              <Image src={Image2} alt='art' width={500} height={300} style={{ maxWidth: "100%", height: "auto"}}/>
+              <Image src={VectorArt2} alt='art' width={500} style={{ maxWidth: "100%", height: "auto"}}/>
             </ImgContainer>
             <TextSection>
-              <Title>Your Secret Weapon for Course Selection</Title>
+              <SectionTitle>Your Secret Weapon for Course Selection</SectionTitle>
               {LearnMoreText.map((line, index) => {
                 return <Text key={index}>{line}</Text>
               })}
@@ -148,58 +180,59 @@ const Main: NextPage = () => {
           </Section>
         </Slide>
       </FullHeightDiv>
+      <FullHeightDiv style={{backgroundImage: `url(${LandingPageBg.src})`}}>
+        <Slide direction='left' className="slide" >
+          <Section style={{marginTop: "3rem", marginBottom: "3rem"}}>
+            <TextSection>
+              <SectionTitle>How it works</SectionTitle>
+              {HowItWorksText.map((line, index) => {
+                return <Text key={index}>{line}</Text>
+              })}
+              {!user ? 
+                <CallToActionBtn onClick={goToSignup} style={{float: "right"}}>
+                  Sign Up For Free
+                </CallToActionBtn> :
+                <CallToActionBtn onClick={goToHome} style={{float: "right"}}>
+                  Go To Home
+                </CallToActionBtn>
+              }
+            </TextSection>
+            <ImgContainer>
+              <Image src={VectorArt3} alt='art' width={400} style={{ maxWidth: "100%", height: "auto"}}/>
+            </ImgContainer>
+          </Section>
+        </Slide>
+      </FullHeightDiv>
     </>
   )
 }
-
-const SvgContainer = styled.div`
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  line-height: 0;
-  shape-rendering: crispEdges;
-  transform: rotate(180deg);
-  background-color: #0A121E;
-
-  svg {
-    position: relative;
-    display: block;
-    width: calc(140% + 1.3px);
-    height: 110px;
-  }
-
-  .shape-fill {
-    fill: #2D3748;
-  }
-`
 
 const ImgContainer = styled.div`
   position: relative;
   height: fit-content;
   overflow: hidden;
-`
+`;
 
 const ButtonGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: end;
   align-items: end;
-`
+`;
 
 const FullHeightDiv = styled.div`
-  overflow-x: hidden;
+  overflow: hidden;
+  position: relative;
+  min-height: calc(90vh - 60px);
+  background-size: cover;
+  width: 100%;
+  height: 100%;
   .slide {
-    min-height: calc(100vh - 60px);
-    overflow-x: hidden;
+    overflow: hidden;
     color: #EDEDEE;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    @media (max-width: 1000px) {
-      margin-top: 0 !important;
-    }
-    
   }
 `;
 
@@ -256,18 +289,26 @@ const CallToActionBtn = styled.button`
 const Section = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   flex-wrap: wrap;
   overflow: hidden;
-  width: 65%;
+  width: 70%;
+  padding: 2rem;
+  margin-top: 10rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid #aaaaaa;
+  border-radius: 15px;
 
   @media (max-width: 1600px) {
     width: 80%;
   }
-  @media (max-width: 1300px) {
-    /* padding: 8rem 1rem; */
+  @media (max-width: 1350px) {
     justify-content: center;
     width: 90%;
+  }
+  @media (max-width: 800px) {
+    margin-top: 3rem;
+    padding: 1rem;
   }
 `;
 
@@ -284,9 +325,9 @@ const MainTitle = styled.h2`
   @media (max-width: 600px) {
     font-size: 28px;
   }
-`
+`;
 
-const Title = styled.h2`
+const SectionTitle = styled.h2`
   font-size: 42px;
   @media (max-width: 1200px) {
     font-size: 28px;
@@ -294,7 +335,7 @@ const Title = styled.h2`
   @media (max-width: 600px) {
     font-size: 22px;
   }
-`
+`;
 
 const MainText = styled.p`
   font-size: 32px;
@@ -304,7 +345,7 @@ const MainText = styled.p`
   @media (max-width: 600px) {
     font-size: 18px;
   }
-`
+`;
 
 const Text = styled.p`
   font-size: 22px;
@@ -314,19 +355,19 @@ const Text = styled.p`
   @media (max-width: 600px) {
     font-size: 16px;
   }
-`
+`;
 
 const TextSection = styled.div`
   width: 50%;
-  @media (max-width: 1000px) {
+  @media (max-width: 1200px) {
     width: 80%;
     margin: 2rem 0;
   }
   @media (max-width: 600px) {
     width: 95%;
-    margin: 2rem 0;
+    margin: 1rem 0;
   }
-`
+`;
 
 const Sticky = styled.div`
   position: sticky;
@@ -369,7 +410,61 @@ const NavButton = styled.button`
     padding: 0px 8px;
     margin: 0px 8px;
   }
-`
+`;
 
+const MiddleContainer = styled.div`
+  height: 200px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  @media (max-width: 800px) {
+    width: 90%;
+  }
+  font-family: monospace;
+`;
+
+const MiddleContainerWrapper = styled.div`
+  height: 100%;
+  overflow: visible;
+  background-color: #0a121e;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+const bounceAnimation = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+`;
+
+const IconContainer = styled.div`
+  padding: 0 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #aaaaaa;
+  text-align: center;
+  padding-top: 3rem;
+  animation: ${bounceAnimation} 2s infinite;
+
+  h5 {
+    padding-top: 1rem;
+  }
+
+  @media (max-width: 800px) {
+    padding: 0 1rem;
+  }
+`;
+
+const CenteredFade = styled(Fade)`
+  height: 100%;
+  display: flex;
+`;
 
 export default Main;

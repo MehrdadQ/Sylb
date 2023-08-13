@@ -48,6 +48,16 @@ const CustomNavbar = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      goToLandingPage();
+      setUser(null);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   const isActive = (pathname: string) => {
     return router.asPath === pathname ? 'active' : '';
   };
@@ -80,7 +90,7 @@ const CustomNavbar = () => {
                 }
               </Nav.Link>
               <Nav.Link as={Link} href="/add-entry" className={isActive("/add-entry")}>Add your syllabus</Nav.Link>
-              <CustomNavDropdown title="Tools" id="basic-nav-dropdown" style={{padding: "0"}}>
+              <CustomNavDropdown title="Explore" id="basic-nav-dropdown" style={{padding: "0"}}>
                 <NavDropdown.Item as={Link} href="/advanced-search" className={isActive("/advanced-search")}>
                   Advanced Search
                 </NavDropdown.Item>
@@ -89,6 +99,14 @@ const CustomNavbar = () => {
                 </NavDropdown.Item>
                 <NavDropdown.Item as={Link} href="/sort-by/semester" className={isActive("/sort-by/semester")}>
                   Most recent courses
+                </NavDropdown.Item>
+              </CustomNavDropdown>
+              <CustomNavDropdown title="More" id="basic-nav-dropdown" style={{padding: "0"}}>
+                <NavDropdown.Item as={Link} href="/contact" className={isActive("/contact")}>
+                  Contact
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={handleLogout}>
+                  Log out
                 </NavDropdown.Item>
               </CustomNavDropdown>
             </Nav>
@@ -120,7 +138,7 @@ const Sticky = styled.div`
   color: #EDEDEE;
   border-bottom: 1px solid black;
   padding: 0px 30px;
-`
+`;
 
 const NavBody = styled.div`
   margin-left: auto;
@@ -155,16 +173,12 @@ const CustomNavDropdown = styled(NavDropdown)`
     padding: 0;
     border-radius: 5px !important;
     position: absolute;
-    width: 300px;
+    max-width: 250px;
     overflow: hidden;
-  }
-  
-  .dropdown-item {
-    transition: all 0.5s;
   }
 
   .dropdown-item:focus, .dropdown-item:hover {
-    padding-left: 25px;
+    font-weight: 600;
   }
   
   .dropdown-item.active, .dropdown-item:active {

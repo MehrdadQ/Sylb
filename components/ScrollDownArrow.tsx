@@ -41,7 +41,7 @@ const moveUpDown = keyframes`
 
 const ScrollDownArrowContainer = styled.div<{ $show: boolean }>`
   position: fixed;
-  bottom: 20px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;

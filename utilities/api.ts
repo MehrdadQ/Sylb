@@ -7,7 +7,7 @@ import { EntryInfo, EntryResultInfo, EntryResultInfoCompact, UserInfo } from './
 export const addUserToCollection = async (uid: string) => {
   const userData: UserInfo = {
     uid: uid,
-    credits: 5,
+    credits: 3,
     hasAccessTo: [],
   };
   const collectionRef = collection(firestore, 'users');

@@ -57,16 +57,6 @@ const SuggestEditPage: React.FC = () => {
     router.push('/add-entry');
   };
 
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      goToLandingPage();
-      setUser(null);
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
   return (
     <>
       <NextSeo
