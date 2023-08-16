@@ -1,6 +1,7 @@
 import { NextSeo } from 'next-seo';
 import styled from 'styled-components';
 import Navbar from "../components/Navbar";
+import Link from 'next/link';
 
 const Error = () => {
   return (
@@ -14,7 +15,7 @@ const Error = () => {
         <div>
           <Header>Payment Failed</Header>
           <h5>Sorry, there was an issue processing your payment. Please try again.</h5>
-          <h5>If you think this is a mistake, please visit the <a href='/contact'>contact page</a>.</h5>
+          <h5>If you think this is a mistake, please visit the <Link href='/contact'>contact page</Link>.</h5>
         </div>
       </MainContainer>
     </>

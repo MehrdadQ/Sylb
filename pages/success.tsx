@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar";
 import { confirmSessionId, getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
+import Link from "next/link";
 
 const Success = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -42,10 +43,6 @@ const Success = () => {
     fetchData();
   }, [session_id]);
   
-  const goToHome = () => {
-    router.push('/home');
-  }
-  
   return (
     <>
       <NextSeo
@@ -58,12 +55,12 @@ const Success = () => {
           {valid ?
             <Container>
               <Header>Payment Successful! You now have {user?.credits! > 10000 ? 'unlimited' : user?.credits} credits!</Header>
-              <Button onClick={goToHome}>Go to Home</Button>
+              <Button as={Link} href={'/home'}>Go to Home</Button>
             </Container> :
             <Container>
               <Header>
                 Oops! It seems like there was an issue with the payment confirmation.
-                If you believe this is an error, please visit the <a href='/contact'>contact page</a>.
+                If you believe this is an error, please visit the <Link href='/contact'>contact page</Link>.
               </Header>
             </Container>
           }

@@ -65,7 +65,7 @@ const CustomNavbar = () => {
   return (
     <Sticky>
       <Navbar expand="sm" variant='dark'>
-        <Navbar.Brand onClick={goToLandingPage} style={{cursor: "pointer"}}>
+        <Navbar.Brand as={Link} href='/' style={{cursor: "pointer"}}>
           <Image
             src="../../logo.svg"
             width="50"

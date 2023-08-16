@@ -2,13 +2,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import type { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
 import Image from 'next/image';
+import Link from "next/link";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Fade, Slide } from "react-awesome-reveal";
-import { Nav, NavItem, Navbar } from 'react-bootstrap';
 import { useRecoilState } from "recoil";
 import styled, { keyframes } from 'styled-components';
 import CustomNavBar from "../components/Navbar";
+import NotLoggedInNavbar from "../components/NotLoggedInNavbar";
 import ScrollDownArrow from '../components/ScrollDownArrow';
 import LandingPageBg from "../public/landing_page_bg.svg";
 import LandingPageBg2 from "../public/landing_page_bg2.svg";
@@ -55,18 +56,6 @@ const Main: NextPage = () => {
     });
   }, [setUser])
 
-  const goToSignup = () => {
-    router.push('/signup');
-  };
-  
-  const goToLogin = () => {
-    router.push('/login');
-  }
-  
-  const goToHome = () => {
-    router.push('/home');
-  }
-
   const scrollToLearnMore = () => {
     const element = document.getElementById('learn-more');
     if (element) {
@@ -85,36 +74,7 @@ const Main: NextPage = () => {
         description="Get UofT syllabuses and course information for free."
       />
       {!user ?
-        <Sticky>
-          <Navbar>
-            <Navbar.Brand href="#">
-              <Image
-                src="logo.svg"
-                width="50"
-                height="50"
-                className="d-inline-block align-top"
-                alt="Logo"
-              />
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <ButtonContainer>
-                <Nav>
-                  <NavItem>
-                    <NavButton onClick={goToSignup}>
-                      Sign up
-                    </NavButton>
-                  </NavItem>
-                  <NavItem>
-                    <NavButton onClick={goToLogin}>
-                      Log in
-                    </NavButton>
-                  </NavItem>
-                </Nav>
-              </ButtonContainer>
-            </Navbar.Collapse>
-          </Navbar> 
-        </Sticky> : 
+        <NotLoggedInNavbar/> : 
         <CustomNavBar/>
       }
       <FullHeightDiv style={{backgroundImage: `url(${LandingPageBg.src})`}}>
@@ -126,10 +86,10 @@ const Main: NextPage = () => {
               <MainText>The ultimate course information guide for UofT students</MainText>
               <ButtonGroup>
                 {!user ? 
-                  <CallToActionBtn onClick={goToSignup}>
+                  <CallToActionBtn as={Link} href={'/signup'}>
                     Sign Up For Free
                   </CallToActionBtn> :
-                  <CallToActionBtn onClick={goToHome}>
+                  <CallToActionBtn as={Link} href={'/home'}>
                     Home
                   </CallToActionBtn>
                 }
@@ -197,13 +157,16 @@ const Main: NextPage = () => {
                 return <Text key={index}>{line}</Text>
               })}
               {!user ? 
-                <CallToActionBtn onClick={goToSignup} style={{float: "right"}}>
+                <CallToActionBtn as={Link} href={'/signup'} style={{float: "right"}}>
                   Sign Up For Free
                 </CallToActionBtn> :
-                <CallToActionBtn onClick={goToHome} style={{float: "right"}}>
+                <CallToActionBtn as={Link} href={'/home'} style={{float: "right"}}>
                   Go To Home
                 </CallToActionBtn>
               }
+              <CallToActionBtn as={Link} href={'/contact'} style={{float: "right"}}>
+                Contact Me
+              </CallToActionBtn>
             </TextSection>
             <ImgContainer>
               <Image src={VectorArt3} alt='art' width={400} style={{ maxWidth: "100%", height: "auto"}} onClick={toggleShowAttribution}/>
@@ -378,49 +341,6 @@ const TextSection = styled.div`
   @media (max-width: 600px) {
     width: 95%;
     margin: 1rem 0;
-  }
-`;
-
-const Sticky = styled.div`
-  position: sticky;
-  position: -webkit-sticky;
-  width: 100%;
-  top: 0;
-  z-index: 100;
-  background-color: #2D3748;
-  color: #EDEDEE;
-  border-bottom: 1px solid black;
-  padding: 0px 30px;
-`
-
-const ButtonContainer = styled.div`
-  margin-left: auto;
-  display: flex;
-`;
-
-const NavButton = styled.button`
-  padding-left: 20px;
-  margin-left: 20px;
-  border: none;
-  background-color: transparent;
-  transition: background-color 0.3s, transform 0.3s;
-
-  &:disabled {
-    pointer-events: none;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    box-shadow: none;
-    transform: translateY(0);
-  }
-
-  @media (max-width: 600px) {
-    padding: 0px 8px;
-    margin: 0px 8px;
   }
 `;
 

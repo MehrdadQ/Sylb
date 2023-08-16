@@ -19,6 +19,7 @@ import { loadingState, userState } from '../../utilities/atoms';
 import { auth } from '../../utilities/firebase';
 import { getCourseEmoji, timeAgo } from '../../utilities/helpers';
 import { EntryResultInfo } from '../../utilities/types';
+import Link from 'next/link';
 
 const SearchPage = () => {
   const router = useRouter();
@@ -67,18 +68,6 @@ const SearchPage = () => {
     setShowReportModal(false);
     toastSuccess("Thank you for reporting this submission! We will review this entry ASAP!")
   }
-
-  const goToEdit = (id: string) => {
-    router.push(`/suggest-edit/${id}`)
-  };
-  
-  const goToAddEntry = () => {
-    router.push("/add-entry")
-  };
-  
-  const goToSettings = () => {
-    router.push("/settings")
-  };
 
   const toastSuccess = (message: string) => {
     toast.success(message, {
@@ -191,7 +180,7 @@ const SearchPage = () => {
               </Button>
               <Footer>
                 <div style={{display: "inline-flex"}}>
-                  <LinkButton onClick={() => goToEdit(entryID)}>
+                  <LinkButton as={Link} href={`/suggest-edit/${entryID}`}>
                     <Image src={EditIcon} alt='loading' style={{width: "18px", height: 'auto'}}/>
                     <p style={{color: '#7bb2ec'}}>Suggest edits</p>
 
@@ -241,11 +230,11 @@ const SearchPage = () => {
             <Modal.Body className='styled'>
               {user?.credits! > 0 ?
                 <p>
-                  One credit will be used to download this syllabus. You will have {user?.credits! - 1} remaining credits.
+                  You currently have {user?.credits!} credits. One credit will be used to download this syllabus.
                 </p> :
                 <p>
-                  You have no remaining credits. Either <span onClick={goToAddEntry}>submit an entry</span> or
-                  go to <span onClick={goToSettings}>settings</span> to get more credits.
+                  You have no remaining credits. Either <Link href={'/add-entry'}>submit an entry</Link> or
+                  go to <Link href={'/shop'}>the shop</Link> to get more credits.
                 </p>
               }
             </Modal.Body>
@@ -469,9 +458,9 @@ const MessageModal = styled(Modal)`
     background-color: #2D3748;
     color: #ededee;
 
-    span {
+    a {
       cursor: pointer;
-      color: #488ED8;
+      color: #77b4f5;
     }
   }
 `;

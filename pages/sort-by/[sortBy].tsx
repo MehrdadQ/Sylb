@@ -159,7 +159,7 @@ const SortByPage: NextPage = () => {
           <ResultContainer>
             {searchResults.map((entry, index) => {
               return (
-                <SearchResultItem entry={entry} key={index} openInNewTab={true} showCourseAverage/>
+                <SearchResultItem entry={entry} key={index} showCourseAverage/>
               )
             })}
           </ResultContainer>

@@ -1,26 +1,17 @@
-import { useRouter } from 'next/router';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
+import CheckmarkIcon from "../public/checkmark.svg";
+import { userState } from '../utilities/atoms';
 import { getCourseEmoji, timeAgo } from '../utilities/helpers';
 import { EntryResultInfoCompact } from '../utilities/types';
-import { useRecoilValue } from 'recoil';
-import { userState } from '../utilities/atoms';
-import CheckmarkIcon from "../public/checkmark.svg";
-import Image from 'next/image';
 
-const SearchResultItem = ({ entry, openInNewTab, showCourseAverage = false }: { entry: EntryResultInfoCompact, openInNewTab: boolean, showCourseAverage?: boolean }) => {
-  const router = useRouter();
+const SearchResultItem = ({ entry, showCourseAverage = false }: { entry: EntryResultInfoCompact, showCourseAverage?: boolean }) => {
   const user = useRecoilValue(userState);
 
-  const goToInfoPage = (entryID: string) => {
-    if (openInNewTab) {
-      window.open(`/entry/${entryID}`);
-    } else {
-      router.push(`/entry/${entryID}`);
-    }
-  }
-
   return (
-    <ResultItem onClick={() => goToInfoPage(entry.id)}>
+    <ResultItem as={Link} href={`/entry/${entry.id}`} target='blank'>
       <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
         <h5>{entry.courseCode} {getCourseEmoji(entry.courseCode.slice(0,3))}</h5>
         <h6>{entry.campus}</h6>

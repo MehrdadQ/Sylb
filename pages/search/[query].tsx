@@ -12,6 +12,7 @@ import LoadingIcon from "../../public/loading.svg";
 import { getEntriesByCourseCode } from '../../utilities/api';
 import { loadingState } from '../../utilities/atoms';
 import { EntryResultInfo } from '../../utilities/types';
+import Link from 'next/link';
 
 const SearchPage = () => {
   const router = useRouter();
@@ -56,10 +57,6 @@ const SearchPage = () => {
     });
   };
 
-  const goToAdvancedSearchPage = () => {
-    router.push(`/advanced-search`);
-  };
-
   return (
     <>
       <NextSeo
@@ -73,13 +70,13 @@ const SearchPage = () => {
           <MainContainer>
             <TopContainer>
               <h3>Search Results for: {searchQuery.toUpperCase()}</h3>
-              <Button onClick={goToAdvancedSearchPage}>Try an Advanced Search</Button>
+              <Button as={Link} href={'/advanced-search'}>Try an Advanced Search</Button>
             </TopContainer>
             {results.length == 0 ? 
             <NoResultsMessage>Unfortunately, there were no results for {searchQuery.toUpperCase()} 😢</NoResultsMessage> :
             <ResultContainer>
               {results.map((result, index) => (
-                <SearchResultItem entry={result} key={index} openInNewTab={false}/>
+                <SearchResultItem entry={result} key={index}/>
               ))}
             </ResultContainer>
             }

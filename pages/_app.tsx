@@ -9,7 +9,7 @@ import '../styles/globals.css';
 import { auth } from '../utilities/firebase';
 import LoadingIcon from "../public/loading.svg";
 import Image from 'next/image';
-
+import { NextSeo } from 'next-seo';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user && !['/', '/login', '/signup'].includes(router.pathname)) {
+      if (!user && !['/', '/login', '/signup', '/forgot-password', '/contact'].includes(router.pathname)) {
         router.push('/login');
       } else {
         setIsLoading(false);
@@ -35,9 +35,14 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   if (isLoading) {
     return (
-      <div style={{display: "flex", width: "100%", height: "100vh", justifyContent: "center"}}>
-        <Image src={LoadingIcon} alt='loading' style={{width: "48px", height: 'auto'}}/>
-      </div>
+      <>
+        <NextSeo
+          title="Sylb"
+        />
+        <div style={{display: "flex", width: "100%", height: "100vh", justifyContent: "center"}}>
+          <Image src={LoadingIcon} alt='loading' style={{width: "48px", height: 'auto'}}/>
+        </div>
+      </>
     )
   }
 

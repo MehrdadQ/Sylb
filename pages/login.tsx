@@ -3,8 +3,9 @@ import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import EmailSvg from "../public/email.svg";
@@ -21,7 +22,6 @@ const LoginPage: NextPage = () => {
 
   const [user, setUser] = useRecoilState(userState);
 
-  const spanRef = useRef<HTMLSpanElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,21 +42,6 @@ const LoginPage: NextPage = () => {
   useEffect(() => {
     setErrors([]);
   }, [password, email]);
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      spanRef.current?.click();
-    }
-  };
-
-  const goToSignup = () => {
-    router.push("/signup")
-  }
-  
-  const goToForgotPassword = () => {
-    router.push("/forgot-password")
-  }
 
   const goToHome = () => {
     router.push("/home")
@@ -129,14 +114,9 @@ const LoginPage: NextPage = () => {
             <DividerLine/>
             <LoginMessage>
               Don&apos;t have an account?{' '}
-              <span
-                onClick={goToSignup}
-                tabIndex={0}
-                ref={spanRef}
-                onKeyDown={handleKeyDown}
-              >
+              <Link href={'/signup'}>
                 Create one here.
-              </span>
+              </Link>
             </LoginMessage>
           </LoginOptionsContainer> :
           <FormContainer>
@@ -154,11 +134,16 @@ const LoginPage: NextPage = () => {
                 onChange={(e: any) => setPassword(e.target.value)}
               />
               <ForgotPasswordMessage>
-                <p onClick={goToForgotPassword}>Forgot your password?</p>
+                <Link href={'/forgot-password'}>Forgot your password?</Link>
               </ForgotPasswordMessage>
               {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
               <ButtonGroup>
-                <Button onClick={() => {setIsEmail(false); setErrors([])}}>Back to login options</Button>
+                <Button
+                  type='button'
+                  onClick={() => {setIsEmail(false); setErrors([])}}
+                >
+                  Back to login options
+                </Button>
                 <Button
                   type="submit"
                   style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
@@ -193,7 +178,7 @@ const DividerLine = styled.hr`
 const ForgotPasswordMessage = styled.div`
   width: 100%;
 
-  p {
+  a {
     cursor: pointer;
     color: #acd6f1;
     float: right;
@@ -201,8 +186,8 @@ const ForgotPasswordMessage = styled.div`
 `;
 
 const LoginMessage = styled.p`
-  span {
-    color: #488ED8;
+  a {
+    color: #77b4f5;
     cursor: pointer;
   }
 `;

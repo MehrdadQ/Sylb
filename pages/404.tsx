@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -10,10 +11,6 @@ import Image404 from '../public/404.png';
 const Custom404: NextPage = () => {
   const [showAttribution, setShowAttribution] = useState(false);
   const router = useRouter();
-  
-  const goToHome = () => {
-    router.push("/home")
-  }
 
   return (
     <>
@@ -26,7 +23,7 @@ const Custom404: NextPage = () => {
         <Container>
           <TextSection>
             <h1>Sorry! The page you&apos;re looking for cannot be found.</h1>
-            <Button onClick={goToHome}>Back to Home</Button>
+            <Button as={Link} href={'/home'}>Back to Home</Button>
           </TextSection>
           <div style={{display: "flex", flexDirection: "column", color: "#0a121e"}}>
             <Picture src={Image404} alt='404' width={500} style={{maxWidth: "100%", height: "auto"}} onClick={() => setShowAttribution(!showAttribution)}/>

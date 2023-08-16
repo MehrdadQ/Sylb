@@ -1,15 +1,22 @@
 import { NextSeo } from 'next-seo';
 import styled from 'styled-components';
-import Navbar from "../components/Navbar";
+import CustomNavbar from "../components/Navbar";
+import { useRecoilValue } from 'recoil';
+import { userState } from '../utilities/atoms';
+import NotLoggedInNavbar from '../components/NotLoggedInNavbar';
 
 const Contact = () => {
+  const user = useRecoilValue(userState);
   return (
     <>
       <NextSeo
         title="Contact - Sylb"
         description="Report an issue with your Sylb account or get in contact about any concerns or inquiries you may have."
       />
-      <Navbar />
+      {!user ?
+        <NotLoggedInNavbar/> : 
+        <CustomNavbar/>
+      }
       <MainContainer>
         <div>
           <Header>Contact Me</Header>

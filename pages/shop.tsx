@@ -13,6 +13,7 @@ import LoadingIcon from "../public/loading.svg";
 import { getUserInfo } from '../utilities/api';
 import { loadingState, userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
+import Link from 'next/link';
 
 const SuggestEditPage: React.FC = () => {
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
@@ -49,14 +50,6 @@ const SuggestEditPage: React.FC = () => {
     });
   };
 
-  const goToLandingPage = () => {
-    router.push('/');
-  };
-
-  const goToAddEntry = () => {
-    router.push('/add-entry');
-  };
-
   return (
     <>
       <NextSeo
@@ -74,13 +67,13 @@ const SuggestEditPage: React.FC = () => {
               
             </Container> :
             <Container>
-              <h3>You currently have {user?.credits!} Credit{user?.credits! > 1 ? 's' : ''}</h3>
+              <h3>You currently have {user?.credits!} Credit{user?.credits! == 1 ? '' : 's'}</h3>
               <InfoText>The credit system serves to encourage contributions from all users,
                 helping our syllabus collection grow for everyone&apos;s benefit.
                 </InfoText>
               <InfoText>
                 Adding syllabus files earn you credits, so we recommend heading to
-                the <span onClick={goToAddEntry}>Add Entry page</span> if you haven&apos;t done so already.
+                the <Link href={'/add-entry'}>add entry page</Link> if you haven&apos;t done so already.
               </InfoText>
               <InfoText>
                 Pro tip: You can get access to previous course pages on Quercus by going
@@ -148,7 +141,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 
-  span {
+  span, a {
     color: #64afff;
     cursor: pointer;
   }

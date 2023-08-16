@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { auth } from '../utilities/firebase';
+import Link from 'next/link';
 
 const ForgotPasswordPage: NextPage = () => {
   const [email, setEmail] = useState<string>('');
@@ -14,10 +15,6 @@ const ForgotPasswordPage: NextPage = () => {
   useEffect(() => {
     setErrors([]);
   }, [email]);
-
-  const goToLogin = () => {
-    router.push("/login")
-  }
 
   const handleResetPassword =  async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +53,7 @@ const ForgotPasswordPage: NextPage = () => {
               />
               {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
               <ButtonGroup>
-                <Button
-                  onClick={goToLogin}
+                <Button as={Link} href={'/login'}
                 >
                   Back to Login
                 </Button>

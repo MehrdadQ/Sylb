@@ -73,17 +73,6 @@ const AddEntryPage: React.FC = () => {
     return localStorage.getItem('visited') === 'true';
   }
 
-  const goToEntry = (entryID: string | null) => {
-    if (entryID) {
-      window.open(`/entry/${entryID}`, '_blank');
-    }
-  };
-  const goToEdit = (entryID: string | null) => {
-    if (entryID) {
-      window.open(`/suggest-edit/${entryID}`, '_blank');
-    }
-  };
-
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
       const { courseCode, semester, professor, campus } = courseData;
@@ -606,9 +595,9 @@ const AddEntryPage: React.FC = () => {
         <Modal.Body>
           An entry for <TextBold>{courseData.courseCode}</TextBold> with <TextBold>{courseData.professor}</TextBold>{' '}
           for <TextBold>{courseData.semester}</TextBold> already exists.
-          You can access it <NavLink onClick={() => goToEntry(duplicateID)}>HERE.</NavLink>
+          You can access it <NavLink href={`/entry/${duplicateID}`}>HERE.</NavLink>
           <br/><br/>If you think the information on that page is not accurate, you can make edit requests{' '}
-          <NavLink onClick={() => goToEdit(duplicateID)}>HERE.</NavLink>
+          <NavLink href={`/suggest-edit/${duplicateID}`}>HERE.</NavLink>
         </Modal.Body>
       </Modal>
       <MessageModal

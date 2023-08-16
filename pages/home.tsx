@@ -14,6 +14,7 @@ import { getLatestSubmissions, getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from "../utilities/firebase";
 import { EntryResultInfoCompact } from "../utilities/types";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,10 +53,6 @@ const Home: NextPage = () => {
     }
   };
 
-  const goToAdvancedSearchPage = () => {
-    router.push(`/advanced-search`);
-  };
-
   return (
     <>
       <NextSeo
@@ -79,7 +76,7 @@ const Home: NextPage = () => {
           </Form>
         </Container>
         <Container style={{paddingTop: '0'}}>
-          <AdvancedSearchButton onClick={goToAdvancedSearchPage}>
+          <AdvancedSearchButton as={Link} href={'/advanced-search'}>
             Do an advanced search
           </AdvancedSearchButton>
         </Container>
@@ -92,7 +89,7 @@ const Home: NextPage = () => {
             <ResultContainer>
               {latestSubmissions.map((entry, index) => {
                 return (
-                  <SearchResultItem entry={entry} key={index} openInNewTab={false}/>
+                  <SearchResultItem entry={entry} key={index}/>
                 )
               })}
             </ResultContainer>

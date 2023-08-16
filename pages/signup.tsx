@@ -12,6 +12,7 @@ import GoogleSvg from "../public/google.svg";
 import { addUserToCollection, getUserInfo } from '../utilities/api';
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
+import Link from 'next/link';
 
 const SignUpPage: NextPage = () => {
   const [isEmail, setIsEmail] = useState<boolean>(false)
@@ -21,8 +22,6 @@ const SignUpPage: NextPage = () => {
   const [errors, setErrors] = useState<string[]>([]);
 
   const [user, setUser] = useRecoilState(userState);
-
-  const spanRef = useRef<HTMLSpanElement>(null);
 
   const router = useRouter();
 
@@ -66,17 +65,6 @@ const SignUpPage: NextPage = () => {
       goToHome();
     }
   };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      spanRef.current?.click();
-    }
-  };
-
-  const goToLogin = () => {
-    router.push("/login")
-  }
 
   const goToHome = () => {
     router.push("/home")
@@ -133,14 +121,9 @@ const SignUpPage: NextPage = () => {
             <DividerLine/>
             <LoginMessage>
               Already have an account?{' '}
-              <span
-                onClick={goToLogin}
-                tabIndex={0}
-                ref={spanRef}
-                onKeyDown={handleKeyDown}
-              >
+              <Link href={'/login'}>
                 Log in here.
-              </span>
+              </Link>
             </LoginMessage>
           </SignupOptionsContainer> :
           <FormContainer>
@@ -165,7 +148,12 @@ const SignUpPage: NextPage = () => {
               />
               {errors.length > 0 && <ErrorMessage>{errors[0]}</ErrorMessage>}
               <ButtonGroup>
-                <Button onClick={() => setIsEmail(false)}>Back to sign up options</Button>
+                <Button
+                  type='button'
+                  onClick={() => setIsEmail(false)}
+                >
+                  Back to sign up options
+                </Button>
                 <Button
                   type="submit"
                   style={{backgroundColor: "#488ED8", color: "#EDEDEE"}}
@@ -198,8 +186,8 @@ const DividerLine = styled.hr`
 `;
 
 const LoginMessage = styled.p`
-  span {
-    color: #488ED8;
+  a {
+    color: #77b4f5;
     cursor: pointer;
   }
 `;
