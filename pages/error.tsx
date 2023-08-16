@@ -9,7 +9,7 @@ const Error = () => {
         <div>
           <Header>Payment Failed</Header>
           <h5>Sorry, there was an issue processing your payment. Please try again.</h5>
-          <h5>If you think this is a mistake, please submit a report through the contact page.</h5>
+          <h5>If you think this is a mistake, please visit the <a href='/contact'>contact page</a>.</h5>
         </div>
       </MainContainer>
     </>
@@ -24,6 +24,10 @@ const MainContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 2rem;
+
+  a {
+    color: #5ca8fa;
+  }
 `;
 
 const Header = styled.h2`

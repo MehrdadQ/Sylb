@@ -59,7 +59,7 @@ const Success = () => {
             <Container>
               <Header>
                 Oops! It seems like there was an issue with the payment confirmation.
-                If you believe this is an error, please submit a report through the contact page.
+                If you believe this is an error, please visit the <a href='/contact'>contact page</a>.
               </Header>
             </Container>
           }
@@ -93,6 +93,10 @@ const Container = styled.div`
 
 const Header = styled.h2`
   padding-bottom: 1rem;
+
+  a {
+    color: #5ca8fa;
+  }
 `;
 
 const Button = styled.button`
