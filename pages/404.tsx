@@ -2,11 +2,13 @@ import { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import styled from 'styled-components';
 import Navbar from '../components/Navbar';
 import Image404 from '../public/404.png';
 
 const Custom404: NextPage = () => {
+  const [showAttribution, setShowAttribution] = useState(false);
   const router = useRouter();
   
   const goToHome = () => {
@@ -20,13 +22,18 @@ const Custom404: NextPage = () => {
         description="Sylb - Page not found"
       />
       <Navbar/>
-      <Container>
-        <TextSection>
-          <h1>Sorry! The page you&apos;re looking for cannot be found.</h1>
-          <Button onClick={goToHome}>Back to Home</Button>
-        </TextSection>
-        <Picture src={Image404} alt='404' width={500} style={{maxWidth: "100%", height: "auto"}}/>
-      </Container>
+      <MainContainer>
+        <Container>
+          <TextSection>
+            <h1>Sorry! The page you&apos;re looking for cannot be found.</h1>
+            <Button onClick={goToHome}>Back to Home</Button>
+          </TextSection>
+          <div style={{display: "flex", flexDirection: "column", color: "#0a121e"}}>
+            <Picture src={Image404} alt='404' width={500} style={{maxWidth: "100%", height: "auto"}} onClick={() => setShowAttribution(!showAttribution)}/>
+            {showAttribution && <a href="https://www.vecteezy.com/free-vector/vector">Vector Vectors by Vecteezy</a>}
+          </div>
+        </Container>
+      </MainContainer>
     </>
   );
 };
@@ -36,21 +43,29 @@ const Picture = styled(Image)`
   height: auto;
 `
 
+const MainContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Container = styled.div`
-  padding: 5rem 12rem;
+  width: 70%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   overflow: hidden;
-
+  
   @media (max-width: 1500px) {
-    padding: 5rem;
+    width: 85%;
     justify-content: center;
   }
-
+  
   @media (max-width: 1200px) {
-    padding: 2rem 0rem;
+    width: 100%;
     justify-content: center;
   }
 `

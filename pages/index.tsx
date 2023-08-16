@@ -3,21 +3,21 @@ import type { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Fade, Slide } from "react-awesome-reveal";
 import { Nav, NavItem, Navbar } from 'react-bootstrap';
 import { useRecoilState } from "recoil";
 import styled, { keyframes } from 'styled-components';
 import CustomNavBar from "../components/Navbar";
 import ScrollDownArrow from '../components/ScrollDownArrow';
-import VectorArt1 from "../public/vectorArt1.png";
-import VectorArt2 from "../public/vectorArt2.png";
-import VectorArt3 from "../public/vectorArt3.png";
 import LandingPageBg from "../public/landing_page_bg.svg";
 import LandingPageBg2 from "../public/landing_page_bg2.svg";
 import ProfessorIcon from "../public/professor.svg";
 import SyllabusIcon from "../public/syllabus.svg";
 import TargetIcon from "../public/target.svg";
+import VectorArt1 from "../public/vectorArt1.png";
+import VectorArt2 from "../public/vectorArt2.png";
+import VectorArt3 from "../public/vectorArt3.png";
 import { getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
@@ -39,6 +39,8 @@ const HowItWorksText = [
 
 
 const Main: NextPage = () => {
+  const [showAttribution, setShowAttribution] = useState(false);
+
   const router = useRouter();
   const [user, setUser] = useRecoilState(userState);
 
@@ -71,6 +73,10 @@ const Main: NextPage = () => {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  const toggleShowAttribution = () => {
+    setShowAttribution(!showAttribution);
+  }
 
   return (
     <>
@@ -133,12 +139,13 @@ const Main: NextPage = () => {
               </ButtonGroup>
             </TextSection>
             <ImgContainer>
-              <Image src={VectorArt1} alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}}/>
+              <Image src={VectorArt1} alt='art' width={400} height={400} style={{maxWidth: "100%", height: "auto"}} onClick={toggleShowAttribution}/>
+              {showAttribution && <a href="https://www.vecteezy.com/free-vector/business">Business Vectors by Vecteezy</a>}
             </ImgContainer>
           </Section>
         </Slide>
-        <div onClick={scrollToLearnMore}>
-          <ScrollDownArrow/>
+        <div>
+          <ScrollDownArrow onClick={scrollToLearnMore}/>
         </div>
       </FullHeightDiv>
       <MiddleContainerWrapper>
@@ -169,7 +176,8 @@ const Main: NextPage = () => {
         <Slide direction='right' className="slide" >
           <Section>
             <ImgContainer>
-              <Image src={VectorArt2} alt='art' width={500} style={{ maxWidth: "100%", height: "auto"}}/>
+              <Image src={VectorArt2} alt='art' width={500} style={{ maxWidth: "100%", height: "auto"}} onClick={toggleShowAttribution}/>
+              {showAttribution && <a href="https://www.vecteezy.com/free-vector/meeting">Meeting Vectors by Vecteezy</a>}
             </ImgContainer>
             <TextSection>
               <SectionTitle>Your Secret Weapon for Course Selection</SectionTitle>
@@ -198,7 +206,8 @@ const Main: NextPage = () => {
               }
             </TextSection>
             <ImgContainer>
-              <Image src={VectorArt3} alt='art' width={400} style={{ maxWidth: "100%", height: "auto"}}/>
+              <Image src={VectorArt3} alt='art' width={400} style={{ maxWidth: "100%", height: "auto"}} onClick={toggleShowAttribution}/>
+              {showAttribution && <a href="https://www.vecteezy.com/free-vector/document">Document Vectors by Vecteezy</a>}
             </ImgContainer>
           </Section>
         </Slide>
@@ -211,6 +220,9 @@ const ImgContainer = styled.div`
   position: relative;
   height: fit-content;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: #3b4d68;
 `;
 
 const ButtonGroup = styled.div`

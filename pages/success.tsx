@@ -1,4 +1,5 @@
 import { onAuthStateChanged } from "firebase/auth";
+import { NextSeo } from 'next-seo';
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useRecoilState } from 'recoil';
@@ -7,7 +8,6 @@ import Navbar from "../components/Navbar";
 import { confirmSessionId, getUserInfo } from "../utilities/api";
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
-
 
 const Success = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -48,6 +48,10 @@ const Success = () => {
   
   return (
     <>
+      <NextSeo
+        title={valid ? "Payment Successful - Sylb" : "Sylb"}
+        description={valid ? "Payment Successful - Sylb" : "Sylb"}
+      />
       <Navbar />
       {user ?
         <MainContainer>

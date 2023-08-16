@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
-const ScrollDownArrow: React.FC = () => {
+interface ScrollDownArrowProps {
+  onClick: () => void;
+}
+
+const ScrollDownArrow: React.FC<ScrollDownArrowProps> = ({ onClick }) => {
   const [showArrow, setShowArrow] = useState(true);
 
   const handleScroll = () => {
@@ -23,7 +27,7 @@ const ScrollDownArrow: React.FC = () => {
   }, []);
 
   return (
-    <ScrollDownArrowContainer $show={showArrow}>
+    <ScrollDownArrowContainer $show={showArrow} onClick={showArrow ? onClick : () => null}>
       <Arrow src="down_arrow.svg" alt="Scroll down" />
     </ScrollDownArrowContainer>
   );
@@ -46,12 +50,14 @@ const ScrollDownArrowContainer = styled.div<{ $show: boolean }>`
   transform: translateX(-50%);
   z-index: 999;
   opacity: 1;
+  cursor: pointer;
   transition: opacity 0.3s ease-in-out;
 
   ${(props) =>
     !props.$show &&
     css`
       opacity: 0;
+      cursor: default;
     `}
 `;
 
@@ -59,7 +65,6 @@ const Arrow = styled.img`
   width: 50px;
   height: 50px;
   animation: ${moveUpDown} 1s ease-in-out infinite;
-  cursor: pointer;
 `;
 
 export default ScrollDownArrow;

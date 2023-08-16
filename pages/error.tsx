@@ -1,9 +1,14 @@
-import Navbar from "../components/Navbar";
+import { NextSeo } from 'next-seo';
 import styled from 'styled-components';
+import Navbar from "../components/Navbar";
 
 const Error = () => {
   return (
     <>
+      <NextSeo
+        title="Error - Sylb"
+        description="There was an issue processing your payment."
+      />
       <Navbar />
       <MainContainer>
         <div>
