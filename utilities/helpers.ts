@@ -31,7 +31,7 @@ const courseEmojis = {
   ENG: "📚",
   POL: "🏛️",
   CHM: "🧪",
-  ANT: "🌐",
+  ANT: "🌍",
   RSM: "💼",
   AER: "✈️",
   ARC: "🏛️",

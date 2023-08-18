@@ -64,19 +64,21 @@ const CustomNavbar = () => {
 
   return (
     <Sticky>
-      <Navbar expand="sm" variant='dark'>
-        <Navbar.Brand as={Link} href='/' style={{cursor: "pointer"}}>
-          <Image
-            src="../../logo.svg"
-            width="50"
-            height="50"
-            className="d-inline-block align-top"
-            alt="Logo"
-          />
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <NavBody>
+       <Navbar expand="lg" variant='dark'>
+        <div>
+          <Navbar.Brand as={Link} href='/' style={{cursor: "pointer"}}>
+            <Image
+              src="../../logo.svg"
+              width="50"
+              height="50"
+              className="d-inline-block align-top"
+              alt="Logo"
+            />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{padding: "9px"}}/>
+        </div>
+        <StyledOffCanvas id="basic-navbar-nav" placement="top">
+          <NavBody style={{float: "right"}}>
             <Nav>
               <Nav.Link as={Link} href="/home" className={isActive("/home")}>Home</Nav.Link>
               <Nav.Link as={Link} href="/shop" className={isActive("/shop")}>
@@ -110,34 +112,73 @@ const CustomNavbar = () => {
                 </NavDropdown.Item>
               </CustomNavDropdown>
             </Nav>
-            <Form className="d-flex" onSubmit={handleSearch}>
-                <Form.Control
-                  type="search"
-                  placeholder="Enter course code..."
-                  className="me-2"
-                  aria-label="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
-                />
-                <SearchButton type='submit' variant="outline-success">Search</SearchButton>
-            </Form>
           </NavBody>
-        </Navbar.Collapse>
+        </StyledOffCanvas>
       </Navbar>
+      <FormContainer>
+        <Form className="d-flex" onSubmit={handleSearch}>
+            <Form.Control
+              type="search"
+              placeholder="Enter course code..."
+              className="me-2"
+              aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
+            />
+            <SearchButton type='submit' variant="outline-success">Search</SearchButton>
+        </Form>
+      </FormContainer>
     </Sticky>
   );
 }
+
+const StyledOffCanvas = styled(Navbar.Offcanvas)`
+  background-color: #2D3748;
+  padding: 0 10px;
+  
+  @media (max-width: 991px) {
+    padding: 2rem;
+
+    a {
+      color: hsla(0, 0%, 100%, 0.55);
+
+      &.dropdown-item {
+        color: black !important;
+        &:hover, &:active, &:focus {
+          color: black !important;
+        }
+      }
+
+      &:hover, &:active, &:focus, &.active {
+        color: hsla(0, 0%, 100%, 0.75) !important;
+      }
+    }
+  }
+`;
+
+const FormContainer = styled.div`
+  padding: 14px 0;
+  @media (max-width: 500px) {
+    width: 60%;
+  }
+`;
 
 const Sticky = styled.div`
   position: sticky;
   position: -webkit-sticky;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
   top: 0;
   z-index: 100;
   background-color: #2D3748;
   color: #EDEDEE;
   border-bottom: 1px solid black;
   padding: 0px 30px;
+  
+  @media (max-width: 500px) {
+    padding: 0px 10px;
+  }
 `;
 
 const NavBody = styled.div`
