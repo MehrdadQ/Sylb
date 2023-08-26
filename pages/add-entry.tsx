@@ -75,9 +75,9 @@ const AddEntryPage: React.FC = () => {
 
   const canAdvance = (currentPage: number) => {
     if (currentPage === 1) {
-      const { courseCode, semester, professor, campus } = courseData;
+      const { courseCode, semester, professor, campus, courseAverage } = courseData;
       return courseCode !== '' && semester !== undefined && professor !== '' && 
-        campus !== undefined;
+        campus !== undefined &&  courseAverage !== undefined;
     }
     if (currentPage === 2) {
       return file !== undefined && file !== null;
@@ -362,7 +362,7 @@ const AddEntryPage: React.FC = () => {
               </Form.Group>
               
               <Form.Group controlId="courseAverage">
-                <StyledFormLabel>Course Average</StyledFormLabel>
+                <StyledFormLabel>Course Average *</StyledFormLabel>
                 <Form.Select
                   size='sm'
                   value={courseData.courseAverage}
@@ -372,7 +372,7 @@ const AddEntryPage: React.FC = () => {
                     setCourseData({ ...courseData, courseAverage: parsedValue as EntryInfo['courseAverage'] });
                   }}    
                 >
-                  <option value="null">What was the course average?</option>
+                  <option value="null">What was the course average? (required)</option>
                   <option value="A+">A+</option>
                   <option value="A">A</option>
                   <option value="A-">A-</option>
@@ -386,7 +386,6 @@ const AddEntryPage: React.FC = () => {
                   <option value="D">D</option>
                   <option value="D-">D-</option>
                   <option value="In progress">In progress</option>
-                  <option value="undefined">Not sure...</option>
                 </Form.Select>
               </Form.Group>
 

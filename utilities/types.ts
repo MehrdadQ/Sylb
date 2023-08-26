@@ -184,6 +184,7 @@ export const courseAverageSorting = {
   'C-': 3,
   'D+': 2,
   'D': 1,
+  'In progress': 0,
 };
 
 export const semesterSorting = {
