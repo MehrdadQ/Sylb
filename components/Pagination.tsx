@@ -48,11 +48,24 @@ const Pagination: React.FC<PaginationProps> = ({
     };
   }, [])
 
-  const getPageNumbersSubset = (dontShowLastPage: boolean | undefined) => {
-    const MAX_VISIBLE_PAGES = dontShowLastPage ? 4 : 3;
-    if (totalPages <= MAX_VISIBLE_PAGES) {
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
+  const getPageNumbersSubset = (stepByStep: boolean | undefined) => {
+    if (stepByStep) {
+      let upUntil: (string | number)[]
+      if (currentPage < 3) {
+        upUntil = Array.from({ length: currentPage }, (_, index) => index + 1);
+      } else {
+        upUntil = ['...', currentPage - 1, currentPage]
+      }
+
+      if (currentPage + 1 === totalPages) {
+        upUntil.push(totalPages)
+      } else if (currentPage < totalPages) {
+        upUntil.push(currentPage + 1, '...')
+      }
+      return upUntil
     }
+
+    const MAX_VISIBLE_PAGES = 3;
 
     const halfVisible = Math.floor(MAX_VISIBLE_PAGES / 2);
     const firstPage = Math.max(currentPage - halfVisible, 1);
@@ -64,11 +77,7 @@ const Pagination: React.FC<PaginationProps> = ({
       visiblePages = [1, '...', ...visiblePages.slice(1)];
     }
     if (lastPage < totalPages) {
-      if (dontShowLastPage) {
-        visiblePages = [...visiblePages.slice(0, currentPage == 1 ? visiblePages.length - 2 : visiblePages.length - 1), '...'];
-      } else {
         visiblePages = [...visiblePages.slice(0, visiblePages.length - 1), '...', totalPages];
-      }
     }
 
     return visiblePages;
