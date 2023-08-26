@@ -196,10 +196,10 @@ const AddEntryPage: React.FC = () => {
         );
 
       const newEntryUid = await addCourseEntry(user?.uid!, updatedCourseData);
-      await updateUserCredits(user?.uid!, user?.credits! + 1);
+      await updateUserCredits(user?.uid!, user?.credits! + 2);
       setUser((prevUser) => ({
         ...prevUser!,
-        credits: user?.credits! + 1,
+        credits: user?.credits! + 2,
         hasAccessTo: [...(prevUser!.hasAccessTo ?? []), newEntryUid],
       }));
     }
@@ -209,7 +209,7 @@ const AddEntryPage: React.FC = () => {
       setIsLoading(false);
       return;
     }
-    toastSuccess(`Added successfully! 🎉 You now have ${user?.credits! + 1} credits!`);
+    toastSuccess(`Added successfully! 🎉 You now have ${user?.credits! + 2} credits!`);
     goNextPage(null);
     setIsLoading(false);
   };
