@@ -18,6 +18,7 @@ import { auth } from '../utilities/firebase';
 
 const CustomNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMenu, setShowMenu] = useState<boolean>(false);
   const [user, setUser] = useRecoilState(userState);
   const router = useRouter();
 
@@ -36,6 +37,10 @@ const CustomNavbar = () => {
       }
     });
   }, [setUser, user, router])
+
+  useEffect(() => {
+    setShowMenu(false)
+  }, [router])
 
   const goToLandingPage = () => {
     router.push('/');
@@ -75,9 +80,9 @@ const CustomNavbar = () => {
               alt="Logo"
             />
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{padding: "9px"}}/>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{padding: "9px"}} onClick={() => setShowMenu(true)}/>
         </div>
-        <StyledOffCanvas id="basic-navbar-nav" placement="top">
+        <StyledOffCanvas id="basic-navbar-nav" placement="top" show={showMenu} onHide={() => setShowMenu(false)}>
           <NavBody style={{float: "right"}}>
             <Nav>
               <Nav.Link as={Link} href="/home" className={isActive("/home")}>Home</Nav.Link>
@@ -101,6 +106,9 @@ const CustomNavbar = () => {
                 </NavDropdown.Item>
                 <NavDropdown.Item as={Link} href="/sort-by/semester" className={isActive("/sort-by/semester")}>
                   Most recent courses
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} href="/sort-by/postTime" className={isActive("/sort-by/postTime")}>
+                  Most recently added submissions
                 </NavDropdown.Item>
               </CustomNavDropdown>
               <CustomNavDropdown title="More" id="basic-nav-dropdown" style={{padding: "0"}}>
@@ -214,7 +222,7 @@ const CustomNavDropdown = styled(NavDropdown)`
     padding: 0;
     border-radius: 5px !important;
     position: absolute;
-    max-width: 250px;
+    /* max-width: 275px; */
     overflow: hidden;
   }
 

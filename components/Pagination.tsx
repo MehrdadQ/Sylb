@@ -17,7 +17,6 @@ type PaginationProps = {
   goNext: () => void;
   goLast: () => void;
   onPageClick: (pageNumber: number) => void;
-  stepByStep?: boolean;
 };
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -28,7 +27,6 @@ const Pagination: React.FC<PaginationProps> = ({
   goNext,
   goLast,
   onPageClick,
-  stepByStep,
 }) => {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
@@ -48,46 +46,27 @@ const Pagination: React.FC<PaginationProps> = ({
     };
   }, [])
 
-  const getPageNumbersSubset = (stepByStep: boolean | undefined) => {
-    if (stepByStep) {
-      let upUntil: (string | number)[]
-      if (currentPage < 3) {
-        upUntil = Array.from({ length: currentPage }, (_, index) => index + 1);
-      } else {
-        upUntil = ['...', currentPage - 1, currentPage]
-      }
-
-      if (currentPage + 1 === totalPages) {
-        upUntil.push(totalPages)
-      } else if (currentPage < totalPages) {
-        upUntil.push(currentPage + 1, '...')
-      }
-      return upUntil
+  const getPageNumbersSubset = () => {
+    let upUntil: (string | number)[]
+    if (currentPage < 3) {
+      upUntil = Array.from({ length: currentPage }, (_, index) => index + 1);
+    } else {
+      upUntil = ['...', currentPage - 1, currentPage]
     }
 
-    const MAX_VISIBLE_PAGES = 3;
-
-    const halfVisible = Math.floor(MAX_VISIBLE_PAGES / 2);
-    const firstPage = Math.max(currentPage - halfVisible, 1);
-    const lastPage = Math.min(firstPage + MAX_VISIBLE_PAGES - 1, totalPages);
-
-    let visiblePages: Array<number | string> = Array.from({ length: lastPage - firstPage + 1 }, (_, index) => firstPage + index);
-
-    if (firstPage > 1) {
-      visiblePages = [1, '...', ...visiblePages.slice(1)];
+    if (currentPage + 1 === totalPages) {
+      upUntil.push(totalPages)
+    } else if (currentPage < totalPages) {
+      upUntil.push(currentPage + 1, '...')
     }
-    if (lastPage < totalPages) {
-        visiblePages = [...visiblePages.slice(0, visiblePages.length - 1), '...', totalPages];
-    }
-
-    return visiblePages;
+    return upUntil
   };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const pageNumbers = getPageNumbersSubset(stepByStep);
+  const pageNumbers = getPageNumbersSubset();
 
   return (
     <PaginationContainer>
@@ -116,9 +95,6 @@ const Pagination: React.FC<PaginationProps> = ({
       <PageButton onClick={goNext} disabled={currentPage === totalPages}>
         <Image src={PaginationNext} width={20} height={20} alt="Next" />
       </PageButton>
-      {!stepByStep && <PageButton onClick={goLast} disabled={currentPage === totalPages}>
-        <Image src={PaginationLast} width={20} height={20} alt="Last" />
-      </PageButton>}
       {showScrollToTop &&
         <PageButton onClick={scrollToTop}>
           <Arrow src={ScrollToTopIcon} width={20} height={20} alt="Scroll To Top" />

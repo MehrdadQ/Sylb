@@ -325,13 +325,14 @@ const AdvancedSearch: NextPage = () => {
             />
           </SelectGroup>
           <SelectGroup>
-            <StyledFormLabel>Has Essay</StyledFormLabel>
+            <StyledFormLabel>Essays</StyledFormLabel>
             <MultiSelect
               options={booleanOptions}
               value={hasEssay}
               onChange={setHasEssay}
               labelledBy="Select"
               disableSearch
+              hasSelectAll={false}
             />
           </SelectGroup>
           <ButtonGroup>

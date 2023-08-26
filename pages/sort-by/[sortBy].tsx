@@ -30,6 +30,7 @@ const SortByPage: NextPage = () => {
   const [numPages, setNumPages] = useState<number>(0);
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const [sortByDisplayValue, setSortByDisplayValue] = useState<string | undefined>(undefined);
+  const [title, setTitle] = useState<string>('');
 
   const [isLoading, setIsLoading] = useRecoilState(loadingState);
   const [user, setUser] = useRecoilState(userState);
@@ -42,12 +43,15 @@ const SortByPage: NextPage = () => {
     if (sortBy === "courseAverage") {
       setSortBy("courseAverageNumValue");
       setSortByDisplayValue("See top UofT courses by course average.");
+      setTitle('Top Courses by Course Average');
     } else if (sortBy === "semester") {
       setSortBy("semesterNumValue");
       setSortByDisplayValue("See latest UofT courses and syllabuses.");
+      setTitle('Most Recent Courses');
     } else if (sortBy === "postTime") {
       setSortBy(sortBy);
       setSortByDisplayValue("See the most recently added UofT course syllabuses.");
+      setTitle('Most Recently Added Submissions');
     } else {
       goTo404();
     }
@@ -157,6 +161,7 @@ const SortByPage: NextPage = () => {
           message ?
           <Message>{message}</Message> :
           <ResultContainer>
+            <Title>{title}</Title>
             {searchResults.map((entry, index) => {
               return (
                 <SearchResultItem entry={entry} key={index} showCourseAverage/>
@@ -173,7 +178,6 @@ const SortByPage: NextPage = () => {
             goBack={() => handlePageChange(currentPage - 1, true)}
             goNext={() => handlePageChange(currentPage + 1, true)}
             onPageClick={(pageNumber: number) => handlePageChange(pageNumber, true)}
-            stepByStep={true}
           />
         }
       </MainContainer>
@@ -261,6 +265,14 @@ const LoadingImage = styled(Image)`
   margin-bottom: 50px;
   width: 50px;
   height: auto;
+`;
+
+const Title = styled.h2`
+  float: left;
+  grid-column: 1 / -1;
+  @media (max-width: 450px) {
+    font-size: 22px;
+  }
 `;
 
 export default SortByPage;

@@ -372,7 +372,7 @@ const AddEntryPage: React.FC = () => {
                     setCourseData({ ...courseData, courseAverage: parsedValue as EntryInfo['courseAverage'] });
                   }}    
                 >
-                  <option value="null">What was the course average? (required)</option>
+                  <option value="undefined">What was the course average? (required)</option>
                   <option value="A+">A+</option>
                   <option value="A">A</option>
                   <option value="A-">A-</option>
