@@ -21,7 +21,7 @@ const Contact = () => {
         <div>
           <Header>Contact Me</Header>
           <h5>If you ever run into any issues with your account or have any questions, please don&apos;t hesitate
-             to <span><a href="mailto:mehrdad.ghannad@gmail.com">reach out through email</a></span>.
+             to <span><a href="mailto:sylb.ca@gmail.com">reach out through email</a></span>.
           </h5>
         </div>
       </MainContainer>
