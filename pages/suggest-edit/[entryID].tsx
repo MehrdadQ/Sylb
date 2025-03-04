@@ -278,7 +278,7 @@ const SuggestEditPage: React.FC = () => {
 
             <Form.Group  controlId="syllabusFile">
               <StyledFormLabel>New Syllabus File <span>{file !== undefined && '(UPDATED)'}</span></StyledFormLabel>
-              <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf,.docx" />
+              <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf" />
             </Form.Group>
 
             <Form.Group controlId="autofail">

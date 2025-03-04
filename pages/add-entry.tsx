@@ -414,8 +414,8 @@ const AddEntryPage: React.FC = () => {
           {currentPage === 2 &&
             <>
               <SingleColumnFormGroup  controlId="syllabusFile">
-                <StyledFormLabel>Syllabus File (PDF or DOCX) *</StyledFormLabel>
-                <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf,.docx" />
+                <StyledFormLabel>Syllabus File (PDF) *</StyledFormLabel>
+                <Form.Control type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf" />
               </SingleColumnFormGroup>
 
               <SingleColumnFormGroup controlId="autofail">
