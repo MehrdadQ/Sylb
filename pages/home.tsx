@@ -72,7 +72,7 @@ const Home: NextPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <SearchButton type='submit' variant="outline-success">Search</SearchButton>
+            <SearchButton>Search</SearchButton>
           </Form>
         </Container>
         <Container style={{paddingTop: '0'}}>
@@ -147,9 +147,10 @@ const MainContainer = styled.div`
 `;
 
 
-const SearchButton = styled(Button)`
+const SearchButton = styled(Button).attrs({ type: "submit" })`
   border-color: #488ED8 !important;
   color: #488ED8 !important;
+  background-color: transparent !important;
   &:hover {
     background-color: #488ED8 !important;
     border-color: #488ED8 !important;

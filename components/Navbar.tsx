@@ -133,7 +133,7 @@ const CustomNavbar = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
             />
-            <SearchButton type='submit' variant="outline-success">Search</SearchButton>
+            <SearchButton>Search</SearchButton>
         </Form>
       </FormContainer>
     </Sticky>
@@ -196,9 +196,10 @@ const NavBody = styled.div`
   justify-content: space-between;
 `;
 
-const SearchButton = styled(Button)`
+const SearchButton = styled(Button).attrs({ type: "submit" })`
   border-color: #488ED8 !important;
   color: #488ED8 !important;
+  background-color: transparent !important;
   &:hover {
     background-color: #488ED8 !important;
     border-color: #488ED8 !important;
