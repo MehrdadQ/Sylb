@@ -302,7 +302,7 @@ const AddEntryPage: React.FC = () => {
               <Form.Group controlId="courseCode">
                 <StyledFormLabel>Course Code *</StyledFormLabel>
                 <Form.Control
-                  placeholder='Enter Course Code (requried)'
+                  placeholder='Enter Course Code (required)'
                   size='sm'
                   type="text"
                   name="courseCode"
@@ -322,7 +322,7 @@ const AddEntryPage: React.FC = () => {
                     setCourseData({ ...courseData, semester: parsedValue });
                   }}
                 >
-                  <option value="undefined">When did you take this course? (requried)</option>
+                  <option value="undefined">When did you take this course? (required)</option>
                   {semesterOptions.map((semester) => (
                     <option key={semester} value={semester}>
                       {semester}
@@ -334,7 +334,7 @@ const AddEntryPage: React.FC = () => {
               <Form.Group controlId="professor">
                 <StyledFormLabel>Professor *</StyledFormLabel>
                 <Form.Control
-                  placeholder='Enter Professor Full Name (requried)'
+                  placeholder='Enter Professor Full Name (required)'
                   size='sm'
                   type="text"
                   name="professor"
