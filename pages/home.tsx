@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo';
 import Image from 'next/image';
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, ButtonProps, Form } from "react-bootstrap";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
@@ -147,7 +147,7 @@ const MainContainer = styled.div`
 `;
 
 
-const SearchButton = styled(Button).attrs({ type: "submit" })`
+const SearchButton = styled(Button).attrs({ type: "submit" })<ButtonProps>`
   border-color: #488ED8 !important;
   color: #488ED8 !important;
   background-color: transparent !important;

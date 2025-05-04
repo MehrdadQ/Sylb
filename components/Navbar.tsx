@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FormEvent, useEffect, useState } from 'react';
-import { Nav, NavDropdown } from 'react-bootstrap';
+import { ButtonProps, Nav, NavDropdown } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Navbar from 'react-bootstrap/Navbar';
@@ -196,7 +196,7 @@ const NavBody = styled.div`
   justify-content: space-between;
 `;
 
-const SearchButton = styled(Button).attrs({ type: "submit" })`
+const SearchButton = styled(Button).attrs({ type: "submit" })<ButtonProps>`
   border-color: #488ED8 !important;
   color: #488ED8 !important;
   background-color: transparent !important;
