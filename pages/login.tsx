@@ -1,4 +1,4 @@
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import { NextPage } from 'next';
 import { NextSeo } from 'next-seo';
@@ -10,7 +10,7 @@ import { useRecoilState } from "recoil";
 import styled from 'styled-components';
 import EmailSvg from "../public/email.svg";
 import GoogleSvg from "../public/google.svg";
-import { getUserInfo } from '../utilities/api';
+import { addUserToCollection, getUserInfo } from '../utilities/api';
 import { userState } from '../utilities/atoms';
 import { auth } from '../utilities/firebase';
 
@@ -85,10 +85,22 @@ const LoginPage: NextPage = () => {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
       await auth.signInWithPopup(provider);
-      setLoggedInUser();
+      const current_auth = getAuth();
+      const currentUser = current_auth.currentUser;
+  
+      if (currentUser) {
+        const uid = currentUser.uid;
+        const existingUser = await getUserInfo(uid);
+        if (!existingUser) {
+          await addUserToCollection(uid);
+        }
+        setUser(existingUser || (await getUserInfo(uid)));
+      }
+  
       goToHome();
     } catch (error: any) {
-      setErrors(["Something went wrong. Try again."])
+      console.error('Google login error:', error);
+      setErrors(["Something went wrong. Try again."]);
     }
   };
 
