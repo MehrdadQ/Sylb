@@ -137,10 +137,10 @@ const SuggestEditPage: React.FC = () => {
           throw new Error();
         }
         updatedCourseData =
-          filterUnchangedFields({ ...info, postTime: new Date().getTime(), syllabusLink: downloadURL, entryID: entryID });
+          filterUnchangedFields({ ...info, postTime: new Date().getTime(), syllabusLink: downloadURL, entryID: entryID, submittedBy: user?.uid });
       } else {
         updatedCourseData =
-          filterUnchangedFields({ ...info, postTime: new Date().getTime(), entryID: entryID });
+          filterUnchangedFields({ ...info, postTime: new Date().getTime(), entryID: entryID, submittedBy: user?.uid });
       }
         
       await requestEntryUpdate(updatedCourseData);

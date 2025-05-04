@@ -62,7 +62,9 @@ const SearchPage = () => {
     setIsLoading(true);
     await requestEntryUpdate({
       entryID: entryID,
-      otherNotes: `REPORT: ${reportMessage}`
+      otherNotes: `REPORT: ${reportMessage}`,
+      postTime: new Date().getTime(),
+      submittedBy: user?.uid
     });
     setIsLoading(false);
     setShowReportModal(false);

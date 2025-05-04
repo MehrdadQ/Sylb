@@ -218,6 +218,14 @@ const AddEntryPage: React.FC = () => {
     const file = e.target.files && e.target.files[0];
 
     if (file) {
+      if (file.type !== 'application/pdf') {
+        toastError("Invalid file type. Please upload a PDF file only.");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+  
       if (file.size > 5 * 1024 * 1024) {
         toastError("File size exceeds the limit. Please upload a file up to 5MB.");
         if (fileInputRef.current) {
