@@ -52,6 +52,9 @@ export type UserInfo = {
 };
 
 export const semesterOptions = [
+  'Fall 2026',
+  'Summer 2026',
+  'Winter 2026',
   'Fall 2025',
   'Summer 2025',
   'Winter 2025',
@@ -126,6 +129,9 @@ export const multipleChoiceOptions = [
 ];
 
 export const semesterDropdownOptions = [
+  { label: "Fall 2026", value: "Fall 2026" },
+  { label: "Summer 2026", value: "Summer 2026" },
+  { label: "Winter 2026", value: "Winter 2026" },
   { label: "Fall 2025", value: "Fall 2025" },
   { label: "Summer 2025", value: "Summer 2025" },
   { label: "Winter 2025", value: "Winter 2025" },
@@ -196,6 +202,9 @@ export const courseAverageSorting = {
 };
 
 export const semesterSorting = {
+  'Fall 2026': 38,
+  'Summer 2026': 37,
+  'Winter 2026': 36,
   'Fall 2025': 35,
   'Summer 2025': 34,
   'Winter 2025': 33,
